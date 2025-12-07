@@ -1,258 +1,251 @@
-# PRIYAH ⚗️
+# PRIYAH
 
 > **An Arcane AI Assistant with Solana Vanity Wallet Forge**
 
-A beautiful, high-fantasy themed Electron application that combines AI chat capabilities with a powerful Solana vanity address generator. Features a dynamic glassmorphic UI with customizable color harmonies and magical animations.
+A fantasy-themed Electron application combining AI chat with a high-speed Solana vanity address generator. Features dynamic glassmorphic UI with customizable color harmonies.
 
-![Electron](https://img.shields.io/badge/Electron-31-47848F?logo=electron)
+![Electron](https://img.shields.io/badge/Electron-29-47848F?logo=electron)
 ![Node](https://img.shields.io/badge/Node-18+-339933?logo=node.js)
 ![Solana](https://img.shields.io/badge/Solana-Web3-9945FF?logo=solana)
 ![License](https://img.shields.io/badge/License-MIT-blue)
 
 ---
 
-## ✨ Features
+## Features
 
-### 🤖 AI Chat
+### AI Chat
 - Local LLM support via **Ollama**
 - Cloud Ollama & **Google Gemini** integration
 - Web search with source verification (TruthSeeker)
 - Code mode with project file management
-- Multiple AI personas via the "Grimoire"
 
-### ⚗️ Sorcerer's Forge (Vanity Wallet Generator)
+### Sorcerer's Forge (Vanity Wallet Generator)
 - **RAW SPEED MODE**: 50,000-200,000+ keys/second
 - Multi-suffix matching (e.g., `MOON,SUN,STAR`)
 - Parallel worker threads (configurable CPU usage)
 - Real-time telemetry dashboard
-- Continuous mining with wallet collection
 - One-click export to Phantom/Solflare
 
-### 🎨 Dynamic Arcana UI
+### Dynamic Arcana UI
 - **HSL Color Harmony System**: Pick primary color, secondary auto-calculates
 - Adjustable harmony offset (0-180°)
-- Magical pulse animations (toggleable)
-- Resizable sidebar with drag handle
-- Custom celestial cursor with lerp movement
+- Astral fluid shader background
 - Glassmorphic dark fantasy theme
 
-### 📊 System Monitoring
-- Real-time CPU core visualization
-- Temperature monitoring (real or synthetic fallback)
-- Performance graphs and telemetry
-
 ---
 
-## 📋 Prerequisites
+## Installation
 
-Before installing PRIYAH, ensure you have:
+### Mac / Linux
 
-| Requirement | Version | Purpose |
-|-------------|---------|---------|
-| **Node.js** | 18+ | Runtime |
-| **npm** | 9+ | Package manager |
-| **Ollama** | Latest | Local AI (optional) |
-| **Git** | Any | Cloning repo |
-
-### Install Ollama (Recommended for AI features)
+#### Prerequisites
 
 ```bash
-# macOS
+# Check Node.js (requires 18+)
+node --version
+
+# If not installed, use Homebrew (Mac) or your package manager
+brew install node
+
+# Or use nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+nvm install 20
+```
+
+#### Install Ollama (for local AI)
+
+```bash
+# Mac
 brew install ollama
 
-# Or download from https://ollama.ai
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
 ```
 
-### Optional: Real CPU Temperature Monitoring
+#### Optional: CPU Temperature Monitoring
 
 ```bash
-# Install osx-cpu-temp for accurate readings
+# Mac - for accurate readings instead of estimates
 brew install osx-cpu-temp
+
+# Linux - install lm-sensors
+sudo apt install lm-sensors  # Debian/Ubuntu
+sudo sensors-detect
 ```
 
-Without this, PRIYAH will show estimated temperatures (marked with `~`).
-
----
-
-## 🚀 Quick Start
-
-### 1. Clone the Repository
+#### Clone & Run
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/priyah.git
+git clone https://github.com/xiello/priyah.git
 cd priyah
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
-```
-
-### 3. Start Ollama (if using local AI)
-
-```bash
-# In a separate terminal
-ollama serve
-
-# Pull a model (first time only)
-ollama pull llama3
-```
-
-### 4. Launch PRIYAH
-
-```bash
 npm start
 ```
 
----
+#### Start Ollama (separate terminal)
 
-## ⚙️ First-Time Setup
-
-When PRIYAH launches for the first time:
-
-1. **Click the ⚙️ Config button** in the header
-
-2. **Choose your AI source:**
-   - **Local (Ollama)**: Uses `http://127.0.0.1:11434` by default
-   - **Cloud (Ollama Remote)**: Enter your remote Ollama URL
-   - **Gemini**: Enter your Google AI API key
-
-3. **Click "Scan"** to detect available models
-
-4. **Select a model** (e.g., `llama3`, `mistral`, `gemma2`)
-
-5. **(Optional)** Set a project path for Code Mode
-
-6. **Click "Save"**
-
----
-
-## 🎮 Usage Guide
-
-### Chat Mode
-- Type messages in the input field and press Enter
-- Enable **Web** mode for internet-enhanced responses
-- Enable **Code** mode to work with project files
-- Use the **Grimoire** to activate AI personas
-
-### Sorcerer's Forge
-1. Switch to the **Forge** tab
-2. Enter a prefix and/or suffixes (comma-separated)
-3. Adjust worker count with the CPU slider
-4. Click **Ignite** to start mining
-5. Found wallets appear in the terminal below
-6. Click a wallet to view details and export
-
-### Dynamic Arcana (Theming)
-1. Open **Config** → Dynamic Arcana section
-2. Pick an **Accent Color** - the whole UI adapts
-3. Adjust **Harmony Offset** (0° = monochrome, 180° = complementary)
-4. Toggle **Magical Pulse** for breathing animations
-5. Drag the sidebar edge to resize
-
----
-
-## 🔧 Configuration
-
-### Environment Variables (optional)
-
-Create a `.env` file for defaults:
-
-```env
-OLLAMA_HOST=http://127.0.0.1:11434
-GEMINI_API_KEY=your_key_here
+```bash
+ollama serve
+ollama pull llama3  # First time only
 ```
 
-### Keyboard Shortcuts
+---
+
+### Windows
+
+#### Prerequisites
+
+1. **Install Node.js 18+**
+   - Download from [nodejs.org](https://nodejs.org/)
+   - Choose the LTS version
+   - Run installer, check "Add to PATH"
+
+2. **Install Git**
+   - Download from [git-scm.com](https://git-scm.com/download/win)
+   - Use default settings
+
+3. **Verify installation** (open PowerShell or Command Prompt):
+   ```powershell
+   node --version
+   git --version
+   ```
+
+#### Install Ollama (for local AI)
+
+1. Download from [ollama.com/download](https://ollama.com/download)
+2. Run the installer
+3. Ollama runs automatically in the system tray
+
+#### Clone & Run
+
+Open PowerShell or Command Prompt:
+
+```powershell
+git clone https://github.com/xiello/priyah.git
+cd priyah
+npm install
+npm start
+```
+
+#### Pull an AI model (first time)
+
+```powershell
+ollama pull llama3
+```
+
+---
+
+### Pre-built Releases (Windows/Mac/Linux)
+
+Download ready-to-run executables from the [Releases](https://github.com/xiello/priyah/releases) page:
+
+| Platform | File |
+|----------|------|
+| Windows | `Priyah-1.0.0-Setup.exe` |
+| macOS | `Priyah-1.0.0.dmg` |
+| Linux | `Priyah-1.0.0.AppImage` |
+
+> **Note:** You still need Ollama installed separately for local AI features.
+
+---
+
+## First-Time Setup
+
+1. **Click Config** in the header
+2. **Choose AI source:**
+   - **Local (Ollama)**: Default `http://127.0.0.1:11434`
+   - **Cloud (Ollama Remote)**: Enter remote URL
+   - **Gemini**: Enter Google AI API key
+3. **Click Scan** to detect models
+4. **Select a model** (e.g., `llama3`, `mistral`)
+5. **Click Save**
+
+---
+
+## Usage
+
+### Chat
+- Type messages and press Enter
+- Enable **Web** for internet-enhanced responses
+- Enable **Code** to work with project files
+
+### Forge (Vanity Wallet)
+1. Switch to **Forge** tab
+2. Enter prefix/suffixes (comma-separated)
+3. Adjust CPU slider for worker count
+4. Click **Ignite** to start
+5. Click found wallets to export
+
+### Theming
+- Open **Config** → Dynamic Arcana
+- Pick **Accent Color** - UI adapts automatically
+- Adjust **Harmony Offset** (0-180°)
+
+---
+
+## Keyboard Shortcuts
 
 | Shortcut | Action |
 |----------|--------|
 | `Enter` | Send message |
-| `Cmd/Ctrl + K` | Focus input |
 | `Cmd/Ctrl + S` | Save file (Code mode) |
-| `Escape` | Close modals/portal |
+| `Escape` | Close modals |
 
 ---
 
-## 🔐 Security Notes
+## Security
 
-- **Private keys** are stored encrypted in user data directory
-- Keys are **never** transmitted over the network
-- Wallet files are saved locally only
+- Private keys stored encrypted locally
+- Keys never transmitted over network
 - Always verify addresses before sending funds
 
 ---
 
-## 📁 Project Structure
-
-```
-priyah/
-├── main.js           # Electron main process
-├── index.html        # Frontend UI
-├── styles.css        # Dynamic Arcana theme
-├── wallet_engine.js  # VanityForge worker system
-├── search_agent.js   # TruthSeeker web search
-├── package.json      # Dependencies
-└── icon.png          # App icon
-```
-
----
-
-## 🛠️ Development
-
-```bash
-# Run in development mode
-npm start
-
-# Package for distribution
-npm run make
-```
-
----
-
-## 📝 Troubleshooting
+## Troubleshooting
 
 ### "Failed to fetch models"
 - Ensure Ollama is running: `ollama serve`
-- Check the host URL in Config (default: `http://127.0.0.1:11434`)
+- Check host URL in Config
 
-### Temperature shows `~` prefix
-- This means synthetic/estimated temperature
-- Install `osx-cpu-temp` for real readings: `brew install osx-cpu-temp`
+### Temperature shows `~`
+- Estimated reading (real sensor not found)
+- Mac: `brew install osx-cpu-temp`
+- Linux: `sudo apt install lm-sensors`
 
 ### Forge is slow
-- Increase worker count in the CPU slider
-- Close other heavy applications
-- Vanity addresses with more characters take exponentially longer
-
-### Custom cursor not showing
-- The cursor uses `mix-blend-mode: difference`
-- It may be less visible on mid-gray backgrounds
+- Increase worker count
+- Longer patterns = exponentially more time
 
 ---
 
-## 📄 License
+## Building from Source
 
-MIT License - See [LICENSE](LICENSE) for details.
+```bash
+# Development
+npm start
+
+# Build executables
+npm run build:win    # Windows
+npm run build:mac    # macOS
+npm run build:linux  # Linux
+```
+
+Outputs go to `dist/` folder.
 
 ---
 
-## 🙏 Credits
+## License
 
-- **Electron** - Cross-platform desktop apps
-- **Ollama** - Local LLM serving
-- **Solana Web3.js** - Blockchain interactions
-- **Chart.js** - Telemetry graphs
-- **Font Awesome** - Icons
-- **Cinzel & Inter** - Typography
+MIT License - See [LICENSE](LICENSE)
+
+---
+
+## Credits
+
+Electron | Ollama | Solana Web3.js | Chart.js | Font Awesome
 
 ---
 
 <div align="center">
-
-**Built with 🧙‍♂️ arcane energy**
-
-*"The forge burns eternal. The code is the spell."*
-
+<i>"The forge burns eternal."</i>
 </div>
