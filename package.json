@@ -1,0 +1,88 @@
+{
+  "name": "priyah-core",
+  "version": "1.0.0",
+  "description": "Druidic AI Interface - Fantasy-themed Power Tool with Local LLM Support",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --enable-logging",
+    "forge": "node wallet_engine.js",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win",
+    "build:mac": "electron-builder --mac",
+    "build:linux": "electron-builder --linux"
+  },
+  "keywords": [
+    "ai",
+    "electron",
+    "ollama",
+    "gemini",
+    "llm",
+    "chat",
+    "solana",
+    "vanity",
+    "fantasy"
+  ],
+  "author": "Seeker",
+  "license": "ISC",
+  "dependencies": {
+    "@google/generative-ai": "^0.1.0",
+    "@solana/web3.js": "^1.98.4",
+    "bip39": "^3.1.0",
+    "bs58": "^5.0.0",
+    "chart.js": "^4.5.1",
+    "cheerio": "^1.0.0-rc.12",
+    "ed25519-hd-key": "^1.3.0",
+    "electron": "^29.0.0",
+    "marked": "^12.0.0",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.seeker.priyah",
+    "productName": "Priyah",
+    "copyright": "Copyright (c) 2024 Seeker",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "**/*",
+      "!dist/**",
+      "!.git/**",
+      "!.github/**",
+      "!*.md",
+      "!*.zip"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.png",
+      "artifactName": "${productName}-${version}-Setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Priyah"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "icon": "icon.png",
+      "category": "public.app-category.productivity"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "icon": "icon.png",
+      "category": "Utility"
+    }
+  },
+  "type": "module"
+}

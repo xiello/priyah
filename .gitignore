@@ -1,0 +1,33 @@
+# Dependencies
+node_modules/
+
+# Electron build output
+dist/
+out/
+
+# User data (will be created in ~/Library/Application Support)
+# Don't track local forge data
+forge_data/
+*.wallet.json
+
+# Environment files
+.env
+.env.local
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*
+
+# Logs
+*.log
+npm-debug.log*
+
+# Temporary files
+tmp/
+temp/

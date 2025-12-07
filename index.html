@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' https:; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https:; frame-src *;">
+    <title>PRIYAH</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- CUSTOM CURSOR - Sun-Dial -->
+    <div id="astral-cursor">
+        <div class="cursor-dot"></div>
+        <svg class="cursor-rays" viewBox="0 0 30 30">
+            <!-- 8 radiating lines -->
+            <line x1="15" y1="2" x2="15" y2="8"/>
+            <line x1="15" y1="22" x2="15" y2="28"/>
+            <line x1="2" y1="15" x2="8" y2="15"/>
+            <line x1="22" y1="15" x2="28" y2="15"/>
+            <line x1="5.8" y1="5.8" x2="9.9" y2="9.9"/>
+            <line x1="20.1" y1="20.1" x2="24.2" y2="24.2"/>
+            <line x1="24.2" y1="5.8" x2="20.1" y2="9.9"/>
+            <line x1="9.9" y1="20.1" x2="5.8" y2="24.2"/>
+        </svg>
+    </div>
+
+    <!-- HEADER -->
+    <header id="header">
+        <div id="title-sigil" data-text="PRIYAH">PRIYAH</div>
+        <div class="header-tools">
+            <button class="btn" onclick="openModal('settings-modal')">
+                <i class="fas fa-cog"></i> Config
+            </button>
+        </div>
+    </header>
+
+    <!-- MAIN GRID -->
+    <main id="main-grid">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="dither-overlay">
+            <div class="section-header">CHRONICLES</div>
+            <div id="session-list"></div>
+            <button class="btn" style="margin-top: auto; justify-content: center; width: 100%;" onclick="startNewSession()">
+                <i class="fas fa-plus"></i> New Chronicle
+            </button>
+        </aside>
+
+        <!-- SIDEBAR RESIZE HANDLE -->
+        <div id="sidebar-resize"></div>
+
+        <!-- STAGE -->
+        <section id="stage">
+            <div id="toolbar">
+                <button class="btn active" id="btn-chat" onclick="switchView('chat')">
+                    <i class="fas fa-comments"></i> Chat
+                </button>
+                <button class="btn" id="btn-forge" onclick="switchView('forge')">
+                    <i class="fas fa-hammer"></i> Forge
+                </button>
+                <button class="btn" id="btn-constellation" onclick="switchView('constellation')">
+                    <i class="fas fa-star"></i> Constellation
+                </button>
+                <div class="toolbar-divider"></div>
+                <button class="btn" id="toggle-search" onclick="toggleMode('search')" title="Enable web search">
+                    <i class="fas fa-globe"></i> Web
+                </button>
+                <button class="btn" id="toggle-code" onclick="toggleMode('code')" title="Enable code mode">
+                    <i class="fas fa-code"></i> Code
+                </button>
+            </div>
+
+            <!-- Chat View -->
+            <div id="view-chat" class="view-panel active dither-overlay">
+                <div id="chat-log">
+                    <div class="msg system">System initialized. Ready to assist.</div>
+                </div>
+                <div id="input-zone">
+                    <div id="input-wrapper">
+                        <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off">
+                        <button id="send-btn" onclick="sendMessage()" title="Send (Enter)">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Forge View - Sorcerer's Terminal -->
+            <div id="view-forge" class="view-panel dither-overlay">
+                <div id="forge-ui">
+                    <div class="forge-card">
+                        <div class="forge-title">◈ SORCERER'S FORGE ◈</div>
+                        <div class="forge-subtitle">Parallel Vanity Address Generator</div>
+                        
+                        <div class="forge-input-row">
+                            <input type="text" id="forge-prefix" class="form-input" placeholder="Prefix (optional)" style="flex: 1;">
+                            <input type="text" id="forge-suffix" class="form-input" placeholder="Suffixes (e.g., MOON,SUN,STAR)" style="flex: 2;">
+                        </div>
+                        
+                        <!-- CPU Monitoring & Worker Control -->
+                        <div style="margin: 12px 0; padding: 12px; background: rgba(0,0,0,0.3); border-radius: 6px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <span style="font-size: 0.75rem; color: var(--c-gold-dim); font-family: var(--f-runic); letter-spacing: 1px;">
+                                    <i class="fas fa-microchip"></i> CPU CORES
+                                </span>
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span id="cpu-temp-display" class="cpu-temp-badge cool">--°C</span>
+                                    <span id="worker-count-label" style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--c-accent);">
+                                        -- / -- cores
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- CPU Cores Visualization -->
+                            <div id="cpu-cores-container" class="cpu-cores-grid" style="margin-bottom: 10px;">
+                                <!-- Cores will be dynamically generated -->
+                            </div>
+                            
+                            <!-- Worker Slider -->
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <span style="font-size: 0.65rem; color: var(--c-text-dim);">Workers:</span>
+                                <input type="range" id="forge-workers" min="1" max="8" value="4" 
+                                    style="flex: 1; accent-color: var(--c-accent); cursor: pointer;"
+                                    oninput="updateWorkerLabel()">
+                            </div>
+                        </div>
+                        
+                        <div class="forge-input-row" style="margin-bottom: 24px;">
+                            <label style="display: flex; align-items: center; gap: 8px; color: var(--c-text-dim); font-size: 0.85rem;">
+                                <input type="checkbox" id="forge-case-sensitive"> Case Sensitive
+                            </label>
+                            <div style="flex: 1;"></div>
+                            <button class="btn btn-primary" onclick="startForge()">
+                                <i class="fas fa-bolt"></i> Ignite
+                            </button>
+                            <button class="btn btn-danger" onclick="stopForge()">
+                                <i class="fas fa-stop"></i> Halt
+                            </button>
+                        </div>
+                        
+                        <!-- Sorcerer's Terminal Dashboard -->
+                        <div class="sorcerer-terminal">
+                            <div class="terminal-header">
+                                <span class="terminal-title">◇ TELEMETRY</span>
+                                <span id="forge-status" style="color: var(--c-text-dim); font-size: 0.8rem;">Idle</span>
+                            </div>
+                            
+                            <div class="telemetry-grid">
+                                <div class="telemetry-stat">
+                                    <div class="telemetry-value" id="stat-speed">0</div>
+                                    <div class="telemetry-label">Keys/Sec</div>
+                                </div>
+                                <div class="telemetry-stat">
+                                    <div class="telemetry-value" id="stat-total">0</div>
+                                    <div class="telemetry-label">Total Tested</div>
+                                </div>
+                                <div class="telemetry-stat">
+                                    <div class="telemetry-value" id="stat-failed" style="color: #c75050;">0</div>
+                                    <div class="telemetry-label">No Match</div>
+                                </div>
+                                <div class="telemetry-stat">
+                                    <div class="telemetry-value" id="stat-workers">0</div>
+                                    <div class="telemetry-label">Workers</div>
+                                </div>
+                            </div>
+                            
+                            <div class="speed-graph">
+                                <canvas id="speed-chart"></canvas>
+                            </div>
+                            
+                            <!-- Live Address Stream -->
+                            <div style="margin-top: 12px; margin-bottom: 12px;">
+                                <div style="font-size: 0.7rem; color: var(--c-gold-dim); margin-bottom: 6px; font-family: var(--f-runic); letter-spacing: 1px;">LIVE STREAM</div>
+                                <div id="address-stream" style="background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 4px; padding: 8px; font-family: var(--f-mono); font-size: 0.7rem; height: 100px; overflow-y: auto;">
+                                    <div style="color: var(--c-text-dim);">Waiting for forge to ignite...</div>
+                                </div>
+                            </div>
+                            
+                            <div class="terminal-log" id="forge-log" style="height: 60px;">
+                                <div class="log-entry">Forge standing by...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Found Wallets Terminal -->
+                        <div id="found-wallets-section" style="margin-top: 24px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="font-size: 0.8rem; color: var(--c-secondary); font-family: var(--f-runic); letter-spacing: 1px;">
+                                    ✦ FOUND WALLETS <span id="found-count" style="color: var(--c-accent);">(0)</span>
+                                </div>
+                                <div style="display: flex; gap: 6px;">
+                                    <button class="btn" style="font-size: 0.7rem; padding: 4px 8px;" onclick="exportAllWallets()">
+                                        <i class="fas fa-download"></i> Export All
+                                    </button>
+                                    <button class="btn" style="font-size: 0.7rem; padding: 4px 8px;" onclick="clearFoundWallets()">
+                                        <i class="fas fa-trash"></i> Clear
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="found-wallets-list" style="background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 6px; max-height: 200px; overflow-y: auto;">
+                                <div style="padding: 16px; text-align: center; color: var(--c-text-dim); font-size: 0.8rem;">
+                                    No wallets found yet. Start mining!
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Selected Wallet Details -->
+                        <div id="wallet-detail" style="display: none; margin-top: 16px; background: var(--c-accent-subtle); border: 2px solid var(--c-accent); border-radius: 8px; padding: 16px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <div style="font-size: 0.9rem; color: var(--c-accent); font-family: var(--f-runic);">SELECTED WALLET</div>
+                                <button class="btn" style="font-size: 0.7rem; padding: 4px 8px;" onclick="closeWalletDetail()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="wallet-label">Address</div>
+                            <div id="detail-address" style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--c-accent); word-break: break-all; padding: 6px; background: rgba(0,0,0,0.3); border-radius: 4px; cursor: pointer;" onclick="copyToClipboard(this.textContent, 'Address')"></div>
+                            
+                            <div style="margin-top: 16px; padding: 12px; background: var(--c-forest); border-radius: 6px;">
+                                <div style="font-size: 0.85rem; color: var(--c-gold); margin-bottom: 8px; font-weight: bold;">
+                                    <i class="fas fa-key"></i> EXPORT PRIVATE KEY
+                                </div>
+                                <div style="font-size: 0.7rem; color: var(--c-text-dim); margin-bottom: 10px;">
+                                    Click any format to copy. Use Base58 for Phantom/Solflare import.
+                                </div>
+                                
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                    <button class="btn btn-gold" onclick="exportPrivateKey('base58')" style="flex: 1; min-width: 120px;">
+                                        <i class="fas fa-copy"></i> Base58 (Phantom)
+                                    </button>
+                                    <button class="btn" onclick="exportPrivateKey('json')" style="flex: 1; min-width: 120px;">
+                                        <i class="fas fa-file-code"></i> JSON Array
+                                    </button>
+                                    <button class="btn" onclick="exportPrivateKey('file')" style="flex: 1; min-width: 120px;">
+                                        <i class="fas fa-download"></i> Download .json
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="wallet-warning" style="margin-top: 12px;">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Never share your private key. This key directly controls the wallet.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Constellation View - Memory Star Map -->
+            <div id="view-constellation" class="view-panel dither-overlay">
+                <canvas id="star-map"></canvas>
+                <div id="star-tooltip" class="star-tooltip" style="display: none;">
+                    <div class="tooltip-date"></div>
+                    <div class="tooltip-summary"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CODE PANEL -->
+        <aside id="code-panel">
+            <div class="code-header">
+                <span><i class="fas fa-folder-tree"></i> Project Files</span>
+                <button class="btn btn-icon" onclick="refreshFileTree()" title="Refresh">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
+            </div>
+            <div id="file-tree"></div>
+            <div id="editor-container">
+                <div id="editor-header">
+                    <span id="editor-filename">No file open</span>
+                    <button class="btn" id="save-btn" onclick="saveActiveFile()">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+                <textarea id="code-editor" spellcheck="false"></textarea>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- MODALS -->
+
+    <!-- Rename Modal -->
+    <div id="rename-modal" class="modal">
+        <div class="modal-box" style="width: 380px;">
+            <div class="modal-title">Rename Chronicle</div>
+            <div class="form-group">
+                <input type="text" id="rename-input" class="form-input" placeholder="Chronicle name">
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('rename-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmRename()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+        <div class="modal-box" style="width: 520px;">
+            <div class="modal-title">Configuration</div>
+            
+            <div class="form-group">
+                <label class="form-label">Assistant Name</label>
+                <input type="text" id="cfg-name" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Model Source</label>
+                <select id="cfg-source" class="form-input" onchange="updateSourceUI()">
+                    <option value="local">Local (Ollama)</option>
+                    <option value="cloud">Cloud (Ollama Remote)</option>
+                    <option value="gemini">Gemini (Google)</option>
+                </select>
+            </div>
+
+            <div id="ui-local">
+                <div class="form-group">
+                    <label class="form-label">Ollama Host URL</label>
+                    <input type="text" id="cfg-local-host" class="form-input" placeholder="http://127.0.0.1:11434">
+                </div>
+            </div>
+            
+            <div id="ui-cloud" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Cloud Ollama URL</label>
+                    <input type="text" id="cfg-cloud-host" class="form-input" placeholder="https://your-ollama-server.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">API Key (optional)</label>
+                    <input type="password" id="cfg-cloud-key" class="form-input">
+                </div>
+            </div>
+            
+            <div id="ui-gemini" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Gemini API Key</label>
+                    <input type="password" id="cfg-gemini-key" class="form-input">
+                </div>
+            </div>
+
+            <div id="ui-model-select">
+                <div class="form-group">
+                    <label class="form-label">Model</label>
+                    <div class="form-input-row">
+                        <select id="cfg-model" class="form-input"></select>
+                        <button class="btn" onclick="refreshModels()">
+                            <i class="fas fa-sync-alt"></i> Scan
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" style="color: var(--c-accent);">Project Path (for code mode)</label>
+                <div class="form-input-row">
+                    <input type="text" id="cfg-project-path" class="form-input" readonly placeholder="Select a folder...">
+                    <button class="btn" onclick="selectFolder()">
+                        <i class="fas fa-folder-open"></i> Browse
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Dynamic Arcana Settings -->
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+                <div class="form-label" style="margin-bottom: 12px;">✧ DYNAMIC ARCANA</div>
+                
+                <div class="settings-row">
+                    <label>Accent Color</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="color" id="cfg-accent-color" value="#50fa7b" onchange="updateAccentColor(this.value)">
+                        <span id="accent-hue-label" style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--c-text-dim);">H: 145°</span>
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <label>Color Harmony Offset</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="range" id="cfg-harmony-offset" min="0" max="180" value="30" 
+                               style="width: 100px;" oninput="updateHarmonyOffset(this.value)">
+                        <span id="harmony-offset-label" style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--c-text-dim); min-width: 35px;">30°</span>
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <label>Magical Pulse Animations</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="cfg-magic-active" onchange="toggleMagicMode(this.checked)">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+                
+                <div class="settings-row">
+                    <label>Sidebar Width</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="range" id="cfg-sidebar-width" min="180" max="400" value="240" 
+                               style="width: 100px;" oninput="updateSidebarWidth(this.value)">
+                        <span id="sidebar-width-label" style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--c-text-dim); min-width: 40px;">240px</span>
+                    </div>
+                </div>
+                
+                <div class="settings-row">
+                    <label>Font Override</label>
+                    <input type="text" id="cfg-font-family" class="form-input" 
+                           style="width: 150px; font-size: 0.8rem;" 
+                           placeholder="System font name..."
+                           title="Override the arcane font with a system font (e.g., Arial, Helvetica)">
+                </div>
+            </div>
+            
+            <!-- Search Agent Settings -->
+            <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--glass-border);">
+                <div class="form-label" style="margin-bottom: 12px;">⊛ TRUTHSEEKER SEARCH</div>
+                
+                <div class="search-depth-grid">
+                    <label class="search-depth-option">
+                        <input type="radio" name="search-depth" value="10">
+                        <div>
+                            <div class="option-name">Soft</div>
+                            <div class="option-desc">10 sources (fast)</div>
+                        </div>
+                    </label>
+                    <label class="search-depth-option">
+                        <input type="radio" name="search-depth" value="30" checked>
+                        <div>
+                            <div class="option-name">Medium</div>
+                            <div class="option-desc">30 sources (balanced)</div>
+                        </div>
+                    </label>
+                    <label class="search-depth-option">
+                        <input type="radio" name="search-depth" value="60">
+                        <div>
+                            <div class="option-name">Power</div>
+                            <div class="option-desc">60 sources (thorough)</div>
+                        </div>
+                    </label>
+                    <label class="search-depth-option">
+                        <input type="radio" name="search-depth" value="100">
+                        <div>
+                            <div class="option-name">Deep</div>
+                            <div class="option-desc">100 sources (exhaustive)</div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn" onclick="closeModal('settings-modal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveSettings()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Portal -->
+    <div id="portal">
+        <div id="portal-head">
+            <button class="btn" onclick="closePortal()">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+            <button class="btn" onclick="openExternal()">
+                <i class="fas fa-external-link-alt"></i> Open in Browser
+            </button>
+            <span id="portal-url"></span>
+        </div>
+        <iframe id="portal-frame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+    </div>
+
+    <!-- Memory Modal (for Constellation view) -->
+    <div id="memory-modal">
+        <div class="memory-modal-content">
+            <div class="memory-modal-header">
+                <h3 id="memory-modal-title">Memory</h3>
+                <button class="btn" onclick="closeMemoryModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="memory-modal-body" id="memory-modal-body">
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toast-container"></div>
+    
+    <!-- Astral Fluid Background -->
+    <canvas id="astral-canvas"></canvas>
+    <!-- Particle Canvas -->
+    <canvas id="particle-canvas"></canvas>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        // --- STATE ---
+        const state = {
+            activeModes: [],
+            activePresets: [],
+            sessions: [],
+            currentSessionIndex: -1,
+            config: {},
+            renameIndex: -1,
+            activeFile: null,
+            isLoading: false
+        };
+
+        // --- DOM ELEMENTS ---
+        const els = {
+            chat: document.getElementById('chat-log'),
+            input: document.getElementById('user-input'),
+            sendBtn: document.getElementById('send-btn'),
+            fileTree: document.getElementById('file-tree'),
+            codeEditor: document.getElementById('code-editor'),
+            editorFilename: document.getElementById('editor-filename'),
+            editorContainer: document.getElementById('editor-container'),
+            grid: document.getElementById('main-grid'),
+            toastContainer: document.getElementById('toast-container')
+        };
+
+        // --- MARKED CONFIG ---
+        marked.setOptions({
+            highlight: (code, lang) => code,
+            breaks: true,
+            gfm: true
+        });
+
+        // --- INITIALIZATION ---
+        window.onload = async () => {
+            try {
+                state.config = await ipcRenderer.invoke('get-config');
+                setupUIFromConfig();
+                state.sessions = await ipcRenderer.invoke('load-memory') || [];
+                renderSessions();
+                setupEventListeners();
+                
+                if (state.config.projectPath && state.config.projectPath !== '') {
+                    refreshFileTree();
+                }
+                
+                // Load previously saved wallets from forge
+                try {
+                    const savedWallets = await ipcRenderer.invoke('load-forge-wallets');
+                    if (savedWallets && savedWallets.length > 0) {
+                        savedWallets.forEach(wallet => {
+                            foundWallets.push(wallet);
+                            addWalletToList(wallet);
+                        });
+                        showToast(`Loaded ${savedWallets.length} saved wallets`, 'info');
+                    }
+                } catch (e) {
+                    // No saved wallets or loading failed - that's okay
+                }
+                
+                els.input.focus();
+            } catch (e) {
+                showToast('Failed to initialize: ' + e.message, 'error');
+            }
+        };
+
+        function setupUIFromConfig() {
+            document.getElementById('cfg-name').value = state.config.assistantName || 'Priyah';
+            document.getElementById('cfg-source').value = state.config.modelSource || 'local';
+            document.getElementById('cfg-local-host').value = state.config.ollamaHost || 'http://127.0.0.1:11434';
+            document.getElementById('cfg-cloud-host').value = state.config.ollamaCloudUrl || '';
+            document.getElementById('cfg-cloud-key').value = state.config.ollamaCloudKey || '';
+            document.getElementById('cfg-gemini-key').value = state.config.geminiKey || '';
+            document.getElementById('cfg-project-path').value = state.config.projectPath || '';
+            
+            updateSourceUI();
+            
+            const modelSel = document.getElementById('cfg-model');
+            if (state.config.preferredModel) {
+                modelSel.add(new Option(state.config.preferredModel, state.config.preferredModel));
+            }
+        }
+
+        function setupEventListeners() {
+            // Enter to send
+            els.input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Link interception for Portal
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('a');
+                if (link && els.chat.contains(link)) {
+                    e.preventDefault();
+                    const url = link.href || link.dataset.url;
+                    if (url) openPortal(url);
+                }
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Cmd/Ctrl + K = focus input
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    els.input.focus();
+                }
+                // Escape = close modals/portal
+                if (e.key === 'Escape') {
+                    closeAllModals();
+                    closePortal();
+                }
+                // Cmd/Ctrl + S = save file
+                if ((e.metaKey || e.ctrlKey) && e.key === 's') {
+                    if (state.activeFile) {
+                        e.preventDefault();
+                        saveActiveFile();
+                    }
+                }
+            });
+
+            // IPC listeners
+            ipcRenderer.on('ai-thought', (e, { step, detail }) => {
+                addThoughtStep(step, detail);
+            });
+
+            ipcRenderer.on('app-error', (e, { message }) => {
+                showToast(message, 'error');
+            });
+            
+            // Vanity forge listeners are defined at the bottom with the Forge code
+        }
+
+        // --- TOAST NOTIFICATIONS ---
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} toast-icon"></i>
+                <span class="toast-message">${escapeHtml(message)}</span>
+                <i class="fas fa-times toast-close" onclick="this.parentElement.remove()"></i>
+            `;
+            els.toastContainer.appendChild(toast);
+            
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // --- VIEW MANAGEMENT ---
+        function switchView(view) {
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            document.getElementById('btn-chat').classList.toggle('active', view === 'chat');
+            document.getElementById('btn-forge').classList.toggle('active', view === 'forge');
+            document.getElementById('btn-constellation').classList.toggle('active', view === 'constellation');
+            
+            // Initialize Constellation when switched to
+            if (view === 'constellation') {
+                initConstellation();
+            }
+        }
+
+        function toggleMode(mode) {
+            const btn = document.getElementById(`toggle-${mode}`);
+            const isActive = state.activeModes.includes(mode);
+            
+            if (isActive) {
+                state.activeModes = state.activeModes.filter(m => m !== mode);
+                btn.classList.remove('active');
+            } else {
+                state.activeModes.push(mode);
+                btn.classList.add('active');
+            }
+
+            if (mode === 'code') {
+                els.grid.classList.toggle('code-open', !isActive);
+                if (!isActive && state.config.projectPath) {
+                    refreshFileTree();
+                }
+            }
+        }
+
+        function togglePreset(pid) {
+            const el = document.querySelector(`[data-preset="${pid}"]`);
+            if (!el) return;
+            
+            if (state.activePresets.includes(pid)) {
+                state.activePresets = state.activePresets.filter(p => p !== pid);
+                el.classList.remove('selected');
+            } else {
+                state.activePresets.push(pid);
+                el.classList.add('selected');
+            }
+        }
+
+        // --- MODALS ---
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        function closeAllModals() {
+            document.querySelectorAll('.modal.visible').forEach(m => m.classList.remove('visible'));
+        }
+
+        function updateSourceUI() {
+            const src = document.getElementById('cfg-source').value;
+            document.getElementById('ui-local').style.display = src === 'local' ? 'block' : 'none';
+            document.getElementById('ui-cloud').style.display = src === 'cloud' ? 'block' : 'none';
+            document.getElementById('ui-gemini').style.display = src === 'gemini' ? 'block' : 'none';
+            document.getElementById('ui-model-select').style.display = src === 'gemini' ? 'none' : 'block';
+        }
+
+        async function refreshModels() {
+            try {
+                const overrides = {
+                    modelSource: document.getElementById('cfg-source').value,
+                    ollamaHost: document.getElementById('cfg-local-host').value,
+                    ollamaCloudUrl: document.getElementById('cfg-cloud-host').value,
+                    ollamaCloudKey: document.getElementById('cfg-cloud-key').value
+                };
+                
+                const models = await ipcRenderer.invoke('get-models', overrides);
+                const sel = document.getElementById('cfg-model');
+                sel.innerHTML = '';
+                
+                const list = overrides.modelSource === 'cloud' ? models.cloud : models.local;
+                (list || []).forEach(m => sel.add(new Option(m, m)));
+                
+                showToast(`Found ${list.length} models`, 'success');
+            } catch (e) {
+                showToast('Failed to fetch models: ' + e.message, 'error');
+            }
+        }
+
+        async function saveSettings() {
+            try {
+                const cfg = {
+                    assistantName: document.getElementById('cfg-name').value,
+                    modelSource: document.getElementById('cfg-source').value,
+                    preferredModel: document.getElementById('cfg-model').value,
+                    ollamaHost: document.getElementById('cfg-local-host').value,
+                    ollamaCloudUrl: document.getElementById('cfg-cloud-host').value,
+                    ollamaCloudKey: document.getElementById('cfg-cloud-key').value,
+                    geminiKey: document.getElementById('cfg-gemini-key').value,
+                    projectPath: document.getElementById('cfg-project-path').value,
+                };
+                
+                await ipcRenderer.invoke('save-config', cfg);
+                state.config = { ...state.config, ...cfg };
+                
+                // Save font override to localStorage
+                const fontOverride = document.getElementById('cfg-font-family').value.trim();
+                if (fontOverride) {
+                    localStorage.setItem('arcana-font-override', fontOverride);
+                    document.documentElement.style.setProperty('--f-runic', `'${fontOverride}', 'FoundationOne', 'NewAcademy', serif`);
+                    document.documentElement.style.setProperty('--f-body', `'${fontOverride}', 'Inter', sans-serif`);
+                } else {
+                    localStorage.removeItem('arcana-font-override');
+                    document.documentElement.style.setProperty('--f-runic', "'FoundationOne', 'NewAcademy', 'Cinzel', serif");
+                    document.documentElement.style.setProperty('--f-body', "'Inter', -apple-system, BlinkMacSystemFont, sans-serif");
+                }
+                
+                closeModal('settings-modal');
+                showToast('Settings saved', 'success');
+                
+                // Update title
+                document.getElementById('title-sigil').textContent = cfg.assistantName.toUpperCase();
+            } catch (e) {
+                showToast('Failed to save settings: ' + e.message, 'error');
+            }
+        }
+
+        async function selectFolder() {
+            const path = await ipcRenderer.invoke('select-folder');
+            if (path) {
+                document.getElementById('cfg-project-path').value = path;
+            }
+        }
+
+        // --- DYNAMIC ARCANA ENGINE ---
+        function hexToHsl(hex) {
+            let r = parseInt(hex.slice(1, 3), 16) / 255;
+            let g = parseInt(hex.slice(3, 5), 16) / 255;
+            let b = parseInt(hex.slice(5, 7), 16) / 255;
+            
+            let max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            
+            if (max === min) {
+                h = s = 0;
+            } else {
+                let d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            
+            return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
+        }
+        
+        function updateAccentColor(hexColor) {
+            const hsl = hexToHsl(hexColor);
+            document.documentElement.style.setProperty('--hue-primary', hsl.h);
+            document.getElementById('accent-hue-label').textContent = `H: ${hsl.h}°`;
+            
+            localStorage.setItem('priyah-accent-hue', hsl.h);
+            localStorage.setItem('priyah-accent-hex', hexColor);
+            
+            // Force background repaint by briefly changing opacity
+            document.body.style.opacity = '0.999';
+            requestAnimationFrame(() => {
+                document.body.style.opacity = '1';
+            });
+            
+            // Also update title data-text for glitch effect
+            const titleEl = document.getElementById('title-sigil');
+            if (titleEl) {
+                titleEl.setAttribute('data-text', titleEl.textContent);
+            }
+        }
+        
+        function updateHarmonyOffset(value) {
+            document.documentElement.style.setProperty('--harmony-offset', value);
+            document.getElementById('harmony-offset-label').textContent = `${value}°`;
+            localStorage.setItem('priyah-harmony-offset', value);
+            
+            // Force background repaint
+            document.body.style.opacity = '0.999';
+            requestAnimationFrame(() => {
+                document.body.style.opacity = '1';
+            });
+        }
+        
+        function updateSidebarWidth(value) {
+            document.documentElement.style.setProperty('--sidebar-width', `${value}px`);
+            document.getElementById('sidebar-width-label').textContent = `${value}px`;
+            localStorage.setItem('priyah-sidebar-width', value);
+        }
+        
+        function toggleMagicMode(enabled) {
+            if (enabled) {
+                document.body.classList.add('magic-active');
+            } else {
+                document.body.classList.remove('magic-active');
+            }
+            localStorage.setItem('priyah-magic-active', enabled);
+        }
+        
+        // Load saved Dynamic Arcana settings on startup
+        function loadArcanaSettings() {
+            const savedHue = localStorage.getItem('priyah-accent-hue');
+            const savedHex = localStorage.getItem('priyah-accent-hex');
+            const savedMagic = localStorage.getItem('priyah-magic-active');
+            const savedOffset = localStorage.getItem('priyah-harmony-offset');
+            const savedWidth = localStorage.getItem('priyah-sidebar-width');
+            
+            if (savedHue) {
+                document.documentElement.style.setProperty('--hue-primary', savedHue);
+                document.getElementById('accent-hue-label').textContent = `H: ${savedHue}°`;
+            }
+            if (savedHex) {
+                document.getElementById('cfg-accent-color').value = savedHex;
+            }
+            if (savedMagic === 'true') {
+                document.body.classList.add('magic-active');
+                document.getElementById('cfg-magic-active').checked = true;
+            }
+            if (savedOffset) {
+                document.documentElement.style.setProperty('--harmony-offset', savedOffset);
+                document.getElementById('cfg-harmony-offset').value = savedOffset;
+                document.getElementById('harmony-offset-label').textContent = `${savedOffset}°`;
+            }
+            if (savedWidth) {
+                document.documentElement.style.setProperty('--sidebar-width', `${savedWidth}px`);
+                document.getElementById('cfg-sidebar-width').value = savedWidth;
+                document.getElementById('sidebar-width-label').textContent = `${savedWidth}px`;
+            }
+            
+            // Load font override
+            const savedFont = localStorage.getItem('arcana-font-override');
+            if (savedFont) {
+                document.getElementById('cfg-font-family').value = savedFont;
+                document.documentElement.style.setProperty('--f-runic', `'${savedFont}', 'FoundationOne', 'NewAcademy', serif`);
+                document.documentElement.style.setProperty('--f-body', `'${savedFont}', 'Inter', sans-serif`);
+            }
+            
+            // Load search depth
+            const savedSearchDepth = localStorage.getItem('priyah-search-depth') || '30';
+            const searchRadio = document.querySelector(`input[name="search-depth"][value="${savedSearchDepth}"]`);
+            if (searchRadio) searchRadio.checked = true;
+        }
+        
+        // Get current search depth setting
+        function getSearchDepth() {
+            const selected = document.querySelector('input[name="search-depth"]:checked');
+            return selected ? parseInt(selected.value) : 30;
+        }
+        
+        // Save search depth when changed
+        document.addEventListener('change', (e) => {
+            if (e.target.name === 'search-depth') {
+                localStorage.setItem('priyah-search-depth', e.target.value);
+            }
+        });
+        
+        // --- CUSTOM CURSOR (Lerp Movement) ---
+        const cursor = document.getElementById('astral-cursor');
+        let cursorX = 0, cursorY = 0;
+        let targetX = 0, targetY = 0;
+        
+        document.addEventListener('mousemove', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+        });
+        
+        document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
+        document.addEventListener('mouseup', () => cursor.classList.remove('clicking'));
+        
+        function updateCursor() {
+            // Lerp factor (0.25 = responsive but weighted)
+            cursorX += (targetX - cursorX) * 0.25;
+            cursorY += (targetY - cursorY) * 0.25;
+            cursor.style.left = `${cursorX}px`;
+            cursor.style.top = `${cursorY}px`;
+            requestAnimationFrame(updateCursor);
+        }
+        updateCursor();
+        
+        // --- SIDEBAR RESIZE ---
+        const sidebarResize = document.getElementById('sidebar-resize');
+        let isResizing = false;
+        
+        sidebarResize.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            sidebarResize.classList.add('dragging');
+            document.body.style.userSelect = 'none';
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+            const newWidth = Math.max(180, Math.min(400, e.clientX));
+            document.documentElement.style.setProperty('--sidebar-width', `${newWidth}px`);
+            document.getElementById('cfg-sidebar-width').value = newWidth;
+            document.getElementById('sidebar-width-label').textContent = `${newWidth}px`;
+        });
+        
+        document.addEventListener('mouseup', () => {
+            if (isResizing) {
+                isResizing = false;
+                sidebarResize.classList.remove('dragging');
+                document.body.style.userSelect = '';
+                // Save the width
+                const width = getComputedStyle(document.documentElement).getPropertyValue('--sidebar-width').trim();
+                localStorage.setItem('priyah-sidebar-width', parseInt(width));
+            }
+        });
+        
+        // Initialize on DOM load
+        document.addEventListener('DOMContentLoaded', loadArcanaSettings);
+
+        // --- PORTAL ---
+        function openPortal(url) {
+            if (!url) return;
+            document.getElementById('portal').classList.add('active');
+            document.getElementById('portal-frame').src = url;
+            document.getElementById('portal-url').textContent = url;
+        }
+
+        function closePortal() {
+            document.getElementById('portal').classList.remove('active');
+            document.getElementById('portal-frame').src = 'about:blank';
+        }
+
+        function openExternal() {
+            const url = document.getElementById('portal-url').textContent;
+            if (url) {
+                ipcRenderer.send('open-external', url);
+            }
+        }
+
+        // --- CHAT LOGIC ---
+        let currentThoughtDiv = null;
+
+        async function sendMessage() {
+            const text = els.input.value.trim();
+            if (!text || state.isLoading) return;
+            
+            state.isLoading = true;
+            els.sendBtn.disabled = true;
+            els.input.value = '';
+            
+            appendMessage('user', text);
+            
+            // Get or create history
+            const history = state.currentSessionIndex >= 0 
+                ? state.sessions[state.currentSessionIndex].history 
+                : [];
+            
+            history.push({ sender: 'user', text });
+            
+            // Create session if new
+            if (state.currentSessionIndex === -1) {
+                saveSession(history);
+            } else {
+                state.sessions[state.currentSessionIndex].history = history;
+            }
+
+            // Show loading
+            createThoughtBubble();
+            showLoading();
+
+            try {
+                const res = await ipcRenderer.invoke('chat-message', {
+                    prompt: text,
+                    history,
+                    modes: state.activeModes,
+                    memoryContext: "",
+                    activePresets: state.activePresets,
+                    searchLimit: getSearchDepth()
+                });
+                
+                hideLoading();
+                
+                if (res.success) {
+                    appendMessage('ai', res.response);
+                    history.push({ sender: 'ai', text: res.response });
+                } else {
+                    appendMessage('error', res.response);
+                }
+                
+                saveSession(history);
+                
+                // Refresh file tree if in code mode
+                if (state.activeModes.includes('code') && res.response.includes('[System:')) {
+                    refreshFileTree();
+                }
+                
+            } catch (e) {
+                hideLoading();
+                appendMessage('error', 'Error: ' + e.message);
+            } finally {
+                state.isLoading = false;
+                els.sendBtn.disabled = false;
+                els.input.focus();
+            }
+        }
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            
+            const content = typeof text === 'object' ? JSON.stringify(text, null, 2) : text;
+            
+            if (role === 'system' || role === 'error') {
+                div.textContent = content;
+            } else {
+                div.innerHTML = marked.parse(content);
+            }
+            
+            // Add copy button to user and AI messages
+            if (role === 'user' || role === 'ai') {
+                const copyBtn = document.createElement('button');
+                copyBtn.className = 'copy-btn';
+                copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                copyBtn.title = 'Copy message';
+                copyBtn.onclick = () => {
+                    navigator.clipboard.writeText(content).then(() => {
+                        copyBtn.innerHTML = '<i class="fas fa-check"></i>';
+                        setTimeout(() => {
+                            copyBtn.innerHTML = '<i class="fas fa-copy"></i>';
+                        }, 1500);
+                    });
+                };
+                div.appendChild(copyBtn);
+            }
+            
+            els.chat.appendChild(div);
+            els.chat.scrollTop = els.chat.scrollHeight;
+        }
+
+        function createThoughtBubble() {
+            const div = document.createElement('div');
+            div.className = 'thought';
+            div.innerHTML = `
+                <div class="thought-head" onclick="this.parentElement.classList.toggle('open')">
+                    <span>Processing...</span>
+                    <i class="fas fa-chevron-down chevron"></i>
+                </div>
+                <div class="thought-body"></div>
+            `;
+            els.chat.appendChild(div);
+            currentThoughtDiv = div.querySelector('.thought-body');
+            els.chat.scrollTop = els.chat.scrollHeight;
+        }
+
+        function addThoughtStep(step, detail) {
+            if (!currentThoughtDiv) return;
+            
+            const stepDiv = document.createElement('div');
+            stepDiv.className = 'thought-step';
+            stepDiv.innerHTML = `<span class="thought-step-label">&gt; ${escapeHtml(step)}</span><br>${detail}`;
+            currentThoughtDiv.appendChild(stepDiv);
+            
+            // Auto-open thought bubble
+            currentThoughtDiv.parentElement.classList.add('open');
+            currentThoughtDiv.parentElement.querySelector('.thought-head span').textContent = step;
+        }
+
+        function showLoading() {
+            const loader = document.createElement('div');
+            loader.className = 'loading-indicator';
+            loader.id = 'loading-indicator';
+            loader.innerHTML = `
+                <div class="sigil-loader">
+                    <div class="octagon"></div>
+                    <div class="octagon"></div>
+                    <div class="center-dot"></div>
+                </div>
+                <span style="margin-left: 10px; font-family: var(--f-runic); letter-spacing: 1px;">DIVINING...</span>
+            `;
+            els.chat.appendChild(loader);
+            els.chat.scrollTop = els.chat.scrollHeight;
+        }
+
+        function hideLoading() {
+            const loader = document.getElementById('loading-indicator');
+            if (loader) loader.remove();
+        }
+
+        // --- SESSION MANAGEMENT ---
+        function renderSessions() {
+            const list = document.getElementById('session-list');
+            list.innerHTML = '';
+            
+            state.sessions.forEach((s, i) => {
+                const div = document.createElement('div');
+                div.className = `chronicle-item ${i === state.currentSessionIndex ? 'active' : ''}`;
+                div.onclick = () => loadSession(i);
+                div.innerHTML = `
+                    <span class="session-name">${escapeHtml(s.name || 'Chronicle ' + (i + 1))}</span>
+                    <div class="chronicle-actions">
+                        <i class="fas fa-pen action-icon" onclick="event.stopPropagation(); promptRename(${i})" title="Rename"></i>
+                        <i class="fas fa-download action-icon" onclick="event.stopPropagation(); exportSession(${i})" title="Export"></i>
+                        <i class="fas fa-trash action-icon" onclick="event.stopPropagation(); deleteSession(${i})" title="Delete"></i>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        function startNewSession() {
+            state.currentSessionIndex = -1;
+            els.chat.innerHTML = '<div class="msg system">New chronicle started. Ready to assist.</div>';
+            renderSessions();
+            els.input.focus();
+        }
+
+        function loadSession(i) {
+            state.currentSessionIndex = i;
+            els.chat.innerHTML = '';
+            state.sessions[i].history.forEach(m => appendMessage(m.sender, m.text));
+            renderSessions();
+        }
+
+        async function saveSession(history) {
+            const name = history[0]?.text.substring(0, 30) || "Chronicle";
+            const sess = { timestamp: new Date().toISOString(), name, history };
+            
+            if (state.currentSessionIndex >= 0) {
+                sess.name = state.sessions[state.currentSessionIndex].name;
+                state.sessions[state.currentSessionIndex] = sess;
+            } else {
+                state.sessions.unshift(sess);
+                state.currentSessionIndex = 0;
+            }
+            
+            try {
+                await ipcRenderer.invoke('save-memory', state.sessions);
+            } catch (e) {
+                console.error('Failed to save session:', e);
+            }
+            
+            renderSessions();
+        }
+
+        function deleteSession(i) {
+            if (confirm('Delete this chronicle? This cannot be undone.')) {
+                state.sessions.splice(i, 1);
+                ipcRenderer.invoke('save-memory', state.sessions);
+                
+                if (i === state.currentSessionIndex) {
+                    startNewSession();
+                } else if (i < state.currentSessionIndex) {
+                    state.currentSessionIndex--;
+                }
+                
+                renderSessions();
+                showToast('Chronicle deleted', 'success');
+            }
+        }
+
+        function promptRename(i) {
+            state.renameIndex = i;
+            document.getElementById('rename-input').value = state.sessions[i].name;
+            openModal('rename-modal');
+            document.getElementById('rename-input').focus();
+        }
+
+        function confirmRename() {
+            if (state.renameIndex >= 0) {
+                const newName = document.getElementById('rename-input').value.trim();
+                if (newName) {
+                    state.sessions[state.renameIndex].name = newName;
+                    ipcRenderer.invoke('save-memory', state.sessions);
+                    renderSessions();
+                    showToast('Chronicle renamed', 'success');
+                }
+                closeModal('rename-modal');
+            }
+        }
+
+        function exportSession(i) {
+            const s = state.sessions[i];
+            const content = s.history.map(m => 
+                `## ${m.sender.toUpperCase()}\n\n${m.text}\n`
+            ).join('\n---\n\n');
+            
+            const blob = new Blob([`# ${s.name}\n\nExported: ${new Date().toLocaleString()}\n\n---\n\n${content}`], 
+                { type: 'text/markdown' });
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${s.name.replace(/[^a-z0-9]/gi, '_')}.md`;
+            a.click();
+            
+            showToast('Chronicle exported', 'success');
+        }
+
+        // --- FILE SYSTEM ---
+        async function refreshFileTree() {
+            if (!state.config.projectPath) {
+                els.fileTree.innerHTML = '<p style="color: var(--c-text-dim); padding: 10px; font-size: 0.8rem;">No project path set. Configure in settings.</p>';
+                return;
+            }
+            
+            try {
+                const files = await ipcRenderer.invoke('get-project-files', state.config.projectPath);
+                renderFileTree(files, els.fileTree);
+            } catch (e) {
+                els.fileTree.innerHTML = `<p style="color: var(--c-error); padding: 10px; font-size: 0.8rem;">Error: ${e.message}</p>`;
+            }
+        }
+
+        function renderFileTree(nodes, container) {
+            container.innerHTML = '';
+            
+            if (!nodes || nodes.length === 0) {
+                container.innerHTML = '<p style="color: var(--c-text-dim); padding: 10px; font-size: 0.8rem;">No files found.</p>';
+                return;
+            }
+            
+            const ul = document.createElement('ul');
+            
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                li.textContent = node.name;
+                li.title = node.path;
+                
+                if (node.type === 'directory') {
+                    li.className = 'dir';
+                    
+                    if (node.children && node.children.length > 0) {
+                        const childUl = document.createElement('ul');
+                        childUl.style.display = 'none';
+                        renderFileTreeInner(node.children, childUl);
+                        li.appendChild(childUl);
+                        
+                        li.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            li.classList.toggle('open');
+                            childUl.style.display = childUl.style.display === 'none' ? 'block' : 'none';
+                        });
+                    }
+                } else {
+                    li.className = 'file';
+                    li.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openFile(node.path);
+                    });
+                }
+                
+                ul.appendChild(li);
+            });
+            
+            container.appendChild(ul);
+        }
+
+        function renderFileTreeInner(nodes, ul) {
+            nodes.forEach(node => {
+                const li = document.createElement('li');
+                li.textContent = node.name;
+                li.title = node.path;
+                
+                if (node.type === 'directory') {
+                    li.className = 'dir';
+                    
+                    if (node.children && node.children.length > 0) {
+                        const childUl = document.createElement('ul');
+                        childUl.style.display = 'none';
+                        renderFileTreeInner(node.children, childUl);
+                        li.appendChild(childUl);
+                        
+                        li.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            li.classList.toggle('open');
+                            childUl.style.display = childUl.style.display === 'none' ? 'block' : 'none';
+                        });
+                    }
+                } else {
+                    li.className = 'file';
+                    li.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openFile(node.path);
+                    });
+                }
+                
+                ul.appendChild(li);
+            });
+        }
+
+        async function openFile(filePath) {
+            try {
+                const content = await ipcRenderer.invoke('read-file-content', filePath);
+                state.activeFile = filePath;
+                els.codeEditor.value = content;
+                els.editorFilename.textContent = filePath.split('/').pop();
+                els.editorContainer.classList.add('visible');
+            } catch (e) {
+                showToast('Failed to open file: ' + e.message, 'error');
+            }
+        }
+
+        async function saveActiveFile() {
+            if (!state.activeFile) return;
+            
+            try {
+                await ipcRenderer.invoke('save-file-content', {
+                    path: state.activeFile,
+                    content: els.codeEditor.value
+                });
+                showToast('File saved', 'success');
+            } catch (e) {
+                showToast('Failed to save: ' + e.message, 'error');
+            }
+        }
+
+        // --- FORGE (Sorcerer's Terminal) ---
+        let speedChart = null;
+        let forgeStartTime = null;
+        let forgeTimerInterval = null;
+        let lastFoundAddress = null;
+        let maxWorkers = 4; // Will be updated from main process
+        
+        // Initialize worker slider
+        async function initWorkerSlider() {
+            try {
+                maxWorkers = await ipcRenderer.invoke('get-max-workers') || 4;
+                const slider = document.getElementById('forge-workers');
+                if (slider) {
+                    slider.max = maxWorkers;
+                    slider.value = Math.ceil(maxWorkers / 2); // Default to 50%
+                    updateWorkerLabel();
+                }
+            } catch (e) {
+                console.log('Could not get max workers:', e);
+            }
+        }
+        
+        function updateWorkerLabel() {
+            const slider = document.getElementById('forge-workers');
+            const label = document.getElementById('worker-count-label');
+            if (slider && label) {
+                const val = parseInt(slider.value);
+                const pct = Math.round((val / maxWorkers) * 100);
+                label.textContent = `${val} / ${maxWorkers} cores (${pct}%)`;
+            }
+        }
+        
+        // Call on load
+        initWorkerSlider();
+        
+        // CPU Monitoring
+        let cpuCoreCount = 0;
+        let cpuMonitorInterval = null;
+        let lastCpuTimes = [];
+        
+        async function initCpuMonitor() {
+            try {
+                const cpuInfo = await ipcRenderer.invoke('get-cpu-info');
+                cpuCoreCount = cpuInfo.coreCount;
+                lastCpuTimes = cpuInfo.cores.map(() => ({ idle: 0, total: 0 }));
+                
+                // Generate core boxes
+                const container = document.getElementById('cpu-cores-container');
+                if (container) {
+                    container.innerHTML = '';
+                    for (let i = 0; i < cpuCoreCount; i++) {
+                        const box = document.createElement('div');
+                        box.className = 'cpu-core-box';
+                        box.id = `cpu-core-${i}`;
+                        box.innerHTML = `
+                            <div class="cpu-core-fill" style="height: 0%"></div>
+                            <span class="cpu-core-label">${i}</span>
+                        `;
+                        container.appendChild(box);
+                    }
+                }
+                
+                // Start periodic updates
+                updateCpuInfo();
+                cpuMonitorInterval = setInterval(updateCpuInfo, 1000);
+            } catch (e) {
+                console.error('Failed to init CPU monitor:', e);
+            }
+        }
+        
+        async function updateCpuInfo() {
+            try {
+                const cpuInfo = await ipcRenderer.invoke('get-cpu-info');
+                
+                // Update core boxes
+                cpuInfo.cores.forEach((core, i) => {
+                    const box = document.getElementById(`cpu-core-${i}`);
+                    if (box) {
+                        const fill = box.querySelector('.cpu-core-fill');
+                        if (fill) {
+                            fill.style.height = `${core.usage}%`;
+                        }
+                        
+                        // Set color based on usage
+                        box.classList.remove('hot', 'critical');
+                        if (core.usage > 90) {
+                            box.classList.add('critical');
+                        } else if (core.usage > 70) {
+                            box.classList.add('hot');
+                        }
+                    }
+                });
+                
+                // Update temperature display
+                const tempDisplay = document.getElementById('cpu-temp-display');
+                const forgeUI = document.getElementById('forge-ui');
+                
+                if (tempDisplay && cpuInfo.temperature !== null) {
+                    const temp = cpuInfo.temperature;
+                    // Show synthetic indicator (~) if temperature is estimated
+                    const synthIndicator = cpuInfo.isSynthetic ? '<span class="temp-synthetic">~</span>' : '';
+                    tempDisplay.innerHTML = `${synthIndicator}${temp}°C`;
+                    
+                    // Update temp badge class
+                    tempDisplay.className = 'cpu-temp-badge';
+                    forgeUI.classList.remove('temp-cool', 'temp-warm', 'temp-hot', 'temp-critical');
+                    
+                    if (temp < 50) {
+                        tempDisplay.classList.add('cool');
+                        forgeUI.classList.add('temp-cool');
+                    } else if (temp < 70) {
+                        tempDisplay.classList.add('warm');
+                        forgeUI.classList.add('temp-warm');
+                    } else if (temp < 85) {
+                        tempDisplay.classList.add('hot');
+                        forgeUI.classList.add('temp-hot');
+                    } else {
+                        tempDisplay.classList.add('critical');
+                        forgeUI.classList.add('temp-critical');
+                    }
+                    
+                    // Add tooltip for synthetic temp
+                    tempDisplay.title = cpuInfo.isSynthetic ? 'Estimated from CPU load (install osx-cpu-temp for real reading)' : 'CPU Temperature';
+                }
+            } catch (e) {
+                // Silently fail
+            }
+        }
+        
+        // Initialize CPU monitor
+        initCpuMonitor();
+        
+        function getAccentColor() {
+            const style = getComputedStyle(document.documentElement);
+            return style.getPropertyValue('--c-accent').trim() || '#50fa7b';
+        }
+        
+        function getAccentColorDim() {
+            const style = getComputedStyle(document.documentElement);
+            const hue = style.getPropertyValue('--hue-primary').trim() || '145';
+            return `hsla(${hue}, 70%, 50%, 0.15)`;
+        }
+        
+        function initSpeedChart() {
+            const ctx = document.getElementById('speed-chart');
+            if (!ctx) return;
+            
+            if (speedChart) {
+                speedChart.destroy();
+            }
+            
+            const accentColor = getAccentColor();
+            const accentBg = getAccentColorDim();
+            
+            speedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Keys/sec',
+                        data: [],
+                        borderColor: accentColor,
+                        backgroundColor: accentBg,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 0 },
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            display: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#8fa08f', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateSpeedChart(speed) {
+            if (!speedChart) return;
+            
+            const now = new Date().toLocaleTimeString();
+            speedChart.data.labels.push(now);
+            speedChart.data.datasets[0].data.push(speed);
+            
+            // Keep last 30 points
+            if (speedChart.data.labels.length > 30) {
+                speedChart.data.labels.shift();
+                speedChart.data.datasets[0].data.shift();
+            }
+            
+            speedChart.update('none');
+        }
+        
+        function addForgeLog(message, type = 'normal') {
+            const log = document.getElementById('forge-log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            // Keep log manageable
+            while (log.children.length > 50) {
+                log.removeChild(log.firstChild);
+            }
+        }
+        
+        function updateForgeTimer() {
+            // Timer is no longer displayed but kept for potential future use
+            if (!forgeStartTime) return;
+        }
+        
+        function startForge() {
+            const prefix = document.getElementById('forge-prefix').value.trim();
+            const suffixString = document.getElementById('forge-suffix').value.trim();
+            const matchCase = document.getElementById('forge-case-sensitive').checked;
+            const workers = parseInt(document.getElementById('forge-workers').value) || Math.ceil(maxWorkers / 2);
+            
+            if (!prefix && !suffixString) {
+                showToast('Please enter a prefix or at least one suffix to search for', 'error');
+                return;
+            }
+            
+            // Parse suffixes for display
+            const suffixes = suffixString.split(',').map(s => s.trim()).filter(s => s);
+            
+            // Validate minimum length (3+ characters for meaningful vanity)
+            if (prefix && prefix.length < 3) {
+                showToast('Prefix must be at least 3 characters for meaningful results', 'error');
+                return;
+            }
+            
+            for (const suf of suffixes) {
+                if (suf.length < 3) {
+                    showToast(`Suffix "${suf}" must be at least 3 characters`, 'error');
+                    return;
+                }
+            }
+            
+            // Reset UI
+            document.getElementById('wallet-detail').style.display = 'none';
+            clearFoundWallets(); // Clear previous found wallets
+            document.getElementById('forge-log').innerHTML = '';
+            document.getElementById('address-stream').innerHTML = '<div style="color: var(--c-accent);">◇ Forging initiated...</div>';
+            document.getElementById('forge-status').textContent = 'Igniting...';
+            document.getElementById('stat-speed').textContent = '0';
+            document.getElementById('stat-total').textContent = '0';
+            document.getElementById('stat-failed').textContent = '0';
+            document.getElementById('stat-workers').textContent = workers;
+            
+            initSpeedChart();
+            
+            forgeStartTime = Date.now();
+            forgeTimerInterval = setInterval(updateForgeTimer, 1000);
+            
+            // Build target description
+            const prefixDesc = prefix ? `Prefix: ${prefix}` : '';
+            const suffixDesc = suffixes.length > 0 ? `Suffix${suffixes.length > 1 ? 'es' : ''}: ${suffixes.join(', ')}` : '';
+            const target = [prefixDesc, suffixDesc].filter(Boolean).join(' | ');
+            
+            addForgeLog(`Target: ${target}`, 'normal');
+            addForgeLog(`Workers: ${workers} | Case sensitive: ${matchCase ? 'Yes' : 'No'}`, 'normal');
+            addForgeLog(`Generating REAL wallets (mnemonic-first)...`, 'normal');
+            
+            ipcRenderer.send('start-mining', { 
+                prefix, 
+                suffixString, // Send comma-separated string
+                matchCase,
+                workers
+            });
+        }
+        
+        function stopForge() {
+            ipcRenderer.send('stop-mining');
+            document.getElementById('forge-status').textContent = 'Halted';
+            addForgeLog('Forge halted by user', 'error');
+            
+            if (forgeTimerInterval) {
+                clearInterval(forgeTimerInterval);
+                forgeTimerInterval = null;
+            }
+        }
+        
+        async function checkWalletBalance() {
+            if (!lastFoundAddress) {
+                showToast('No wallet to check', 'error');
+                return;
+            }
+            
+            showToast('Checking balance...', 'info');
+            
+            try {
+                const result = await ipcRenderer.invoke('check-wallet-balance', lastFoundAddress);
+                if (result.error) {
+                    showToast(`Balance check failed: ${result.error}`, 'error');
+                } else if (result.hasBalance) {
+                    showToast(`🎉 TREASURE FOUND! Balance: ${result.balance} SOL`, 'success');
+                    addForgeLog(`TREASURE: ${result.balance} SOL found!`, 'success');
+                } else {
+                    showToast('No treasure found (0 SOL)', 'info');
+                }
+            } catch (e) {
+                showToast(`Error: ${e.message}`, 'error');
+            }
+        }
+        
+        function updateAddressStream(addresses, prefix, suffixString) {
+            const stream = document.getElementById('address-stream');
+            if (!addresses || addresses.length === 0) return;
+            
+            // Parse suffixes
+            const suffixes = (suffixString || '').split(',').map(s => s.trim().toUpperCase()).filter(s => s);
+            const prefixUpper = (prefix || '').toUpperCase();
+            
+            // Build new entries
+            addresses.forEach(addr => {
+                const div = document.createElement('div');
+                div.style.marginBottom = '2px';
+                div.style.whiteSpace = 'nowrap';
+                div.style.overflow = 'hidden';
+                div.style.textOverflow = 'ellipsis';
+                
+                const addrUpper = addr.toUpperCase();
+                let html = '<span class="text-danger">✗</span> ';
+                
+                // Check for prefix match
+                if (prefixUpper && addrUpper.startsWith(prefixUpper)) {
+                    html += `<span class="text-accent">${addr.substring(0, prefix.length)}</span>`;
+                    html += `<span class="text-dim">${addr.substring(prefix.length)}</span>`;
+                } 
+                // Check for any suffix match
+                else {
+                    let matchedSuffix = null;
+                    for (const suf of suffixes) {
+                        if (addrUpper.endsWith(suf)) {
+                            matchedSuffix = suf;
+                            break;
+                        }
+                    }
+                    
+                    if (matchedSuffix) {
+                        html += `<span class="text-dim">${addr.substring(0, addr.length - matchedSuffix.length)}</span>`;
+                        html += `<span class="text-accent">${addr.substring(addr.length - matchedSuffix.length)}</span>`;
+                    } else {
+                        html += `<span class="text-dim">${addr}</span>`;
+                    }
+                }
+                
+                div.innerHTML = html;
+                stream.appendChild(div);
+            });
+            
+            // Keep only last 50 entries
+            while (stream.children.length > 50) {
+                stream.removeChild(stream.firstChild);
+            }
+            
+            // Auto-scroll
+            stream.scrollTop = stream.scrollHeight;
+        }
+        
+        // Handle telemetry updates from forge
+        ipcRenderer.on('vanity-telemetry', (e, telemetry) => {
+            document.getElementById('forge-status').textContent = 'Forging...';
+            document.getElementById('stat-speed').textContent = telemetry.keysPerSecond.toLocaleString();
+            document.getElementById('stat-total').textContent = telemetry.totalAttempts.toLocaleString();
+            document.getElementById('stat-failed').textContent = telemetry.failedAttempts.toLocaleString();
+            document.getElementById('stat-workers').textContent = telemetry.activeWorkers;
+            
+            updateSpeedChart(telemetry.keysPerSecond);
+            
+            // Update live address stream
+            if (telemetry.recentAddresses && telemetry.recentAddresses.length > 0) {
+                const prefix = document.getElementById('forge-prefix').value.trim();
+                const suffix = document.getElementById('forge-suffix').value.trim();
+                updateAddressStream(telemetry.recentAddresses, prefix, suffix);
+            }
+        });
+        
+        // Handle progress updates (backward compatibility)
+        ipcRenderer.on('vanity-progress', (e, data) => {
+            document.getElementById('forge-status').textContent = 'Forging...';
+            document.getElementById('stat-speed').textContent = data.speed.toLocaleString();
+            document.getElementById('stat-total').textContent = data.attempts.toLocaleString();
+            document.getElementById('stat-failed').textContent = data.attempts.toLocaleString();
+            
+            updateSpeedChart(data.speed);
+            
+            // Update live address stream if available
+            if (data.recentAddresses && data.recentAddresses.length > 0) {
+                const prefix = document.getElementById('forge-prefix').value.trim();
+                const suffix = document.getElementById('forge-suffix').value.trim();
+                updateAddressStream(data.recentAddresses, prefix, suffix);
+            }
+        });
+        
+        // Store found wallets and currently selected wallet
+        let foundWallets = [];
+        let selectedWallet = null;
+        let lastToastTime = 0;
+        const TOAST_THROTTLE_MS = 2000; // Only show toast every 2 seconds max
+        
+        // Handle wallet found (continuous mining - doesn't stop)
+        ipcRenderer.on('vanity-found', (e, data) => {
+            // Add to found wallets list
+            foundWallets.push(data);
+            
+            // Update count
+            document.getElementById('found-count').textContent = `(${foundWallets.length})`;
+            
+            // Add to visual list
+            addWalletToList(data);
+            
+            // Log it
+            addForgeLog(`FOUND #${foundWallets.length}: ${data.address}`, 'success');
+            
+            // Throttled notification (prevent spam)
+            const now = Date.now();
+            if (now - lastToastTime > TOAST_THROTTLE_MS) {
+                showToast(`Wallet found! (${foundWallets.length} total)`, 'success');
+                lastToastTime = now;
+            }
+        });
+        
+        // Add wallet entry to the found wallets list
+        function addWalletToList(wallet) {
+            const list = document.getElementById('found-wallets-list');
+            
+            // Remove "no wallets" placeholder if present
+            if (foundWallets.length === 1) {
+                list.innerHTML = '';
+            }
+            
+            const entry = document.createElement('div');
+            entry.className = 'found-wallet-entry';
+            entry.onclick = () => selectWallet(wallet);
+            
+            const matchInfo = [];
+            if (wallet.matchedPrefix) matchInfo.push(`${wallet.matchedPrefix}...`);
+            if (wallet.matchedSuffix) matchInfo.push(`...${wallet.matchedSuffix}`);
+            
+            entry.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-family: var(--f-mono); font-size: 0.75rem; color: var(--c-accent);">
+                        ${wallet.address.substring(0, 8)}...${wallet.address.slice(-8)}
+                    </div>
+                    <div style="font-size: 0.65rem; color: var(--c-gold);">
+                        ${matchInfo.join(' ')}
+                    </div>
+                </div>
+                <div style="font-size: 0.65rem; color: var(--c-text-dim); margin-top: 4px;">
+                    Found at ${wallet.attempts.toLocaleString()} attempts
+                </div>
+            `;
+            
+            list.appendChild(entry);
+            list.scrollTop = list.scrollHeight; // Auto-scroll to bottom
+        }
+        
+        // Select a wallet to view details
+        function selectWallet(wallet) {
+            selectedWallet = wallet;
+            
+            document.getElementById('wallet-detail').style.display = 'block';
+            document.getElementById('detail-address').textContent = wallet.address;
+        }
+        
+        // Close wallet detail panel
+        function closeWalletDetail() {
+            document.getElementById('wallet-detail').style.display = 'none';
+            selectedWallet = null;
+        }
+        
+        // Clear found wallets list
+        function clearFoundWallets() {
+            foundWallets = [];
+            selectedWallet = null;
+            document.getElementById('found-count').textContent = '(0)';
+            document.getElementById('found-wallets-list').innerHTML = `
+                <div style="padding: 16px; text-align: center; color: var(--c-text-dim); font-size: 0.8rem;">
+                    No wallets found yet. Start mining!
+                </div>
+            `;
+            document.getElementById('wallet-detail').style.display = 'none';
+        }
+        
+        // Export all found wallets to a text file
+        function exportAllWallets() {
+            if (foundWallets.length === 0) {
+                showToast('No wallets to export', 'error');
+                return;
+            }
+            
+            const now = new Date();
+            const dateStr = now.toISOString().split('T')[0];
+            const timeStr = now.toLocaleTimeString();
+            
+            let content = `=== PRIYAH WALLET EXPORT ===\n`;
+            content += `Date: ${dateStr} ${timeStr}\n`;
+            content += `Total Wallets: ${foundWallets.length}\n`;
+            content += `${'='.repeat(40)}\n\n`;
+            
+            foundWallets.forEach((wallet, i) => {
+                content += `[${i + 1}] Address:\n`;
+                content += `    ${wallet.address}\n\n`;
+                content += `    Private Key (Base58 - Phantom Ready):\n`;
+                content += `    ${wallet.privateKeyBase58}\n\n`;
+                if (wallet.matchedSuffix) {
+                    content += `    Matched Suffix: ${wallet.matchedSuffix}\n`;
+                }
+                if (wallet.matchedPrefix) {
+                    content += `    Matched Prefix: ${wallet.matchedPrefix}\n`;
+                }
+                content += `${'─'.repeat(40)}\n\n`;
+            });
+            
+            content += `\n⚠ SECURITY WARNING:\n`;
+            content += `Keep this file secure. Anyone with these private keys\n`;
+            content += `has full control over these wallets.\n`;
+            
+            // Create and download file
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `priyah_wallets_${dateStr}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showToast(`Exported ${foundWallets.length} wallets`, 'success');
+        }
+        
+        // Export private key in various formats
+        function exportPrivateKey(format) {
+            if (!selectedWallet) {
+                showToast('No wallet selected', 'error');
+                return;
+            }
+            
+            switch (format) {
+                case 'base58':
+                    // This is the format Phantom/Solflare accept for import
+                    if (selectedWallet.privateKeyBase58) {
+                        copyToClipboard(selectedWallet.privateKeyBase58, 'Private Key (Base58)');
+                    } else {
+                        showToast('Base58 key not available', 'error');
+                    }
+                    break;
+                    
+                case 'json':
+                    // Standard Solana CLI format
+                    if (selectedWallet.secretKeyArray) {
+                        const jsonStr = JSON.stringify(selectedWallet.secretKeyArray);
+                        copyToClipboard(jsonStr, 'Secret Key (JSON)');
+                    } else {
+                        showToast('JSON key not available', 'error');
+                    }
+                    break;
+                    
+                case 'file':
+                    // Download as keypair.json file
+                    if (selectedWallet.secretKeyArray) {
+                        const blob = new Blob([JSON.stringify(selectedWallet.secretKeyArray)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `${selectedWallet.address.substring(0, 8)}_keypair.json`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        URL.revokeObjectURL(url);
+                        showToast('Keypair file downloaded!', 'success');
+                    } else {
+                        showToast('Key data not available', 'error');
+                    }
+                    break;
+            }
+        }
+        
+        // Generic copy to clipboard helper
+        function copyToClipboard(text, label) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`${label} copied to clipboard!`, 'success');
+            }).catch(() => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+        
+        // Handle errors
+        ipcRenderer.on('vanity-error', (e, { message }) => {
+            document.getElementById('forge-status').textContent = 'Error';
+            addForgeLog(`Error: ${message}`, 'error');
+            showToast(message, 'error');
+            
+            if (forgeTimerInterval) {
+                clearInterval(forgeTimerInterval);
+                forgeTimerInterval = null;
+            }
+        });
+        
+        // Handle search results for Safe Cards
+        ipcRenderer.on('search-results', (e, data) => {
+            console.log('Search results received:', data);
+            // Safe Cards could be rendered here in a future enhancement
+        });
+
+        // ============================================
+        // CONSTELLATION VIEW - Memory Star Map
+        // ============================================
+        let constellationInitialized = false;
+        let memoryIndex = [];
+        let starCanvas, starCtx;
+
+        async function initConstellation() {
+            starCanvas = document.getElementById('star-map');
+            starCtx = starCanvas.getContext('2d');
+            
+            // Resize canvas
+            resizeStarCanvas();
+            window.addEventListener('resize', resizeStarCanvas);
+            
+            // Load memory index
+            try {
+                memoryIndex = await ipcRenderer.invoke('get-memory-index');
+                renderStarMap();
+            } catch (e) {
+                console.error('Failed to load memory index:', e);
+            }
+            
+            constellationInitialized = true;
+        }
+
+        function resizeStarCanvas() {
+            if (!starCanvas) return;
+            starCanvas.width = starCanvas.parentElement.clientWidth;
+            starCanvas.height = starCanvas.parentElement.clientHeight;
+            if (constellationInitialized) renderStarMap();
+        }
+
+        function renderStarMap() {
+            if (!starCtx || memoryIndex.length === 0) return;
+            
+            const w = starCanvas.width;
+            const h = starCanvas.height;
+            
+            // Clear canvas
+            starCtx.clearRect(0, 0, w, h);
+            
+            // Get accent color from CSS
+            const accentColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--c-accent').trim();
+            
+            // Calculate star positions (spiral layout)
+            const stars = memoryIndex.map((mem, i) => {
+                const angle = (i / memoryIndex.length) * Math.PI * 4;
+                const radius = 100 + (i / memoryIndex.length) * (Math.min(w, h) / 2 - 150);
+                return {
+                    x: w / 2 + Math.cos(angle) * radius,
+                    y: h / 2 + Math.sin(angle) * radius,
+                    radius: 4 + Math.min(8, mem.messageCount / 5),
+                    data: mem
+                };
+            });
+            
+            // Draw connecting lines (Thread of Time)
+            starCtx.beginPath();
+            starCtx.strokeStyle = accentColor.replace(')', ', 0.2)').replace('hsl', 'hsla');
+            starCtx.lineWidth = 1;
+            stars.forEach((star, i) => {
+                if (i === 0) starCtx.moveTo(star.x, star.y);
+                else starCtx.lineTo(star.x, star.y);
+            });
+            starCtx.stroke();
+            
+            // Draw stars
+            stars.forEach(star => {
+                // Glow
+                const gradient = starCtx.createRadialGradient(
+                    star.x, star.y, 0,
+                    star.x, star.y, star.radius * 3
+                );
+                gradient.addColorStop(0, accentColor.replace(')', ', 0.8)').replace('hsl', 'hsla'));
+                gradient.addColorStop(1, 'transparent');
+                starCtx.beginPath();
+                starCtx.fillStyle = gradient;
+                starCtx.arc(star.x, star.y, star.radius * 3, 0, Math.PI * 2);
+                starCtx.fill();
+                
+                // Core
+                starCtx.beginPath();
+                starCtx.fillStyle = accentColor;
+                starCtx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                starCtx.fill();
+            });
+            
+            // Store stars for interaction
+            starCanvas.stars = stars;
+            
+            // Add event listeners
+            starCanvas.onmousemove = handleStarHover;
+            starCanvas.onclick = handleStarClick;
+        }
+
+        function handleStarHover(e) {
+            const rect = starCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const tooltip = document.getElementById('star-tooltip');
+            let hoveredStar = null;
+            
+            for (const star of (starCanvas.stars || [])) {
+                const dist = Math.sqrt((x - star.x) ** 2 + (y - star.y) ** 2);
+                if (dist < star.radius * 2) {
+                    hoveredStar = star;
+                    break;
+                }
+            }
+            
+            if (hoveredStar) {
+                tooltip.style.display = 'block';
+                tooltip.style.left = `${e.clientX + 10}px`;
+                tooltip.style.top = `${e.clientY + 10}px`;
+                tooltip.querySelector('.tooltip-date').textContent = 
+                    new Date(hoveredStar.data.date).toLocaleDateString();
+                tooltip.querySelector('.tooltip-summary').textContent = 
+                    hoveredStar.data.summary || 'No summary';
+                starCanvas.style.cursor = 'pointer';
+            } else {
+                tooltip.style.display = 'none';
+                starCanvas.style.cursor = 'default';
+            }
+        }
+
+        function handleStarClick(e) {
+            const rect = starCanvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            for (const star of (starCanvas.stars || [])) {
+                const dist = Math.sqrt((x - star.x) ** 2 + (y - star.y) ** 2);
+                if (dist < star.radius * 2) {
+                    openMemoryModal(star.data);
+                    break;
+                }
+            }
+        }
+
+        async function openMemoryModal(memoryData) {
+            try {
+                const chronicle = await ipcRenderer.invoke('load-chronicle', memoryData.path);
+                
+                document.getElementById('memory-modal-title').textContent = 
+                    chronicle.name || new Date(chronicle.date).toLocaleDateString();
+                
+                const body = document.getElementById('memory-modal-body');
+                body.innerHTML = '';
+                
+                (chronicle.messages || []).forEach(msg => {
+                    const div = document.createElement('div');
+                    div.className = `memory-message ${msg.sender}`;
+                    div.innerHTML = `
+                        <div class="sender">${msg.sender}</div>
+                        <div>${marked.parse(msg.text)}</div>
+                    `;
+                    body.appendChild(div);
+                });
+                
+                document.getElementById('memory-modal').classList.add('active');
+            } catch (e) {
+                showToast('Failed to load memory: ' + e.message, 'error');
+            }
+        }
+
+        function closeMemoryModal() {
+            document.getElementById('memory-modal').classList.remove('active');
+        }
+
+        // ============================================
+        // PARTICLE BACKGROUND SYSTEM
+        // ============================================
+        let particles = [];
+        let particleCanvas, particleCtx;
+
+        function initParticles() {
+            particleCanvas = document.getElementById('particle-canvas');
+            particleCtx = particleCanvas.getContext('2d');
+            
+            resizeParticleCanvas();
+            window.addEventListener('resize', resizeParticleCanvas);
+            
+            // Create 50 particles
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * particleCanvas.width,
+                    y: Math.random() * particleCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.3,
+                    vy: (Math.random() - 0.5) * 0.3,
+                    size: Math.random() * 2 + 1,
+                    opacity: Math.random() * 0.5 + 0.2
+                });
+            }
+            
+            animateParticles();
+        }
+
+        function resizeParticleCanvas() {
+            if (!particleCanvas) return;
+            particleCanvas.width = window.innerWidth;
+            particleCanvas.height = window.innerHeight;
+        }
+
+        function animateParticles() {
+            if (!particleCtx) return;
+            
+            particleCtx.clearRect(0, 0, particleCanvas.width, particleCanvas.height);
+            
+            // Get accent color
+            const style = getComputedStyle(document.documentElement);
+            const hue = style.getPropertyValue('--hue-primary').trim() || '145';
+            
+            particles.forEach(p => {
+                // Update position
+                p.x += p.vx;
+                p.y += p.vy;
+                
+                // Wrap around edges
+                if (p.x < 0) p.x = particleCanvas.width;
+                if (p.x > particleCanvas.width) p.x = 0;
+                if (p.y < 0) p.y = particleCanvas.height;
+                if (p.y > particleCanvas.height) p.y = 0;
+                
+                // Draw particle with accent color
+                particleCtx.beginPath();
+                particleCtx.fillStyle = `hsla(${hue}, 70%, 60%, ${p.opacity})`;
+                particleCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                particleCtx.fill();
+            });
+            
+            requestAnimationFrame(animateParticles);
+        }
+
+        // ============================================
+        // ASTRAL VISUALS - Fluid Background
+        // ============================================
+        let astralVisuals = null;
+        
+        function initAstralVisuals() {
+            const { AstralVisuals } = require('./visuals.js');
+            astralVisuals = new AstralVisuals('astral-canvas');
+            astralVisuals.handleVisibility();
+            astralVisuals.start();
+        }
+
+        // Initialize particles and astral on load
+        window.addEventListener('load', () => {
+            initParticles();
+            initAstralVisuals();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,43 @@
+FONTLOG for the Foundation One font
+
+This file provides detailed information on the Foundation One font software.  This information should be distributed along with the Foundation One font and any derivative works.
+
+Basic Font Information
+
+Foundation One is based on the central font design used in Foundation, the Apple TV+ series.
+
+Foundation One is taken from the design most people would associate with the show.  It features distinctive S, M, U, W, B, K and G shapes not shared with other typefaces.  Many characters and all the numbers include dots in the design (H, 1, 3) or as a decorative element (A, S, W).  This design is used with text superimposed on the visuals, almost always to indicate a new context, such as a location (e.g., “SYNNAX”) or a change in the time frame, for example, “400 YEARS EARLIER,” and “17 YEARS AFTER THE STARBRIDGE BOMBING.” 
+
+Foundation One is a Unicode typeface family that supports all languages that use the Latin script and its variants, and could be expanded to support other scripts.
+
+More specifically, this release of version 0.4 supports the following Unicode ranges:  U+0020 - U+007D, U+2013 - U+201D
+
+This release contains much of the Basic Latin codebase characters (with the lowercase glyphs being duplicates of the uppercase), as well as various symbols and punctuation located elsewhere, 99 characters (or 101 glyphs, including spaces) in all.
+
+Documentation and source files can be found at github.com/rsperberg/foundation-one
+
+A related font OFL based on the title sequence of Foundation is located at github.com/rsperberg/foundation-titles-hand
+
+Foundation One was created using iFontMaker, the iPad font-design tool made by Eiji and Tom, Inc., which you can find at 2ttf.com.  The font can also be downloaded from 2ttf.com/BW7GxybNOS0 (the Gallery at 2ttf.com hosts some 65,000 fonts created with iFontMaker that are available for downloading).
+
+To contribute to the project, visit the Github page.
+
+ChangeLog
+
+18-24 October 2021 (Roger Sperberg) Foundation One version 0.4
+- created Github repository with ttf and source files, OFL and other information files and samples
+- initial release to public (but not Github release)
+
+Acknowledgments
+
+If you make modifications be sure to add your name (N), email (E), web-address (if you have one) (W) and description (D). This list is in alphabetical order.
+
+N: Roger Sperberg
+E: glypheryfonts@gmail.com
+W: http://glyphery.com
+D: Designer - made original Roman glyphs from character design used onscreen in Foundation, an Apple TV+ series, designer unknown
+
+Glyphery is a font foundry created by Roger Sperberg, located on the web at glyphery.com.
+
+-----
+© 2021 GitHub, Inc.
