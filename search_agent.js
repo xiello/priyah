@@ -7,9 +7,77 @@
  * - Pre-scoring phase using keyword matching on title+snippet
  * - Concurrency control for verification (chunked processing)
  * - Depth and preFiltered metrics
+ * 
+ * GHOST & SHIELD v1.0:
+ * - User-Agent rotation pool (never reuse sequentially)
+ * - Privacy headers (DNT, Sec-GPC)
+ * - Ad/Tracker domain blocklist
+ * - Memory wiping after searches
  */
 
 import * as cheerio from 'cheerio';
+
+// ============================================
+// GHOST PROTOCOL - User Agent Rotation
+// ============================================
+const USER_AGENT_POOL = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 14_1) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15',
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:121.0) Gecko/20100101 Firefox/121.0',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 14.1; rv:121.0) Gecko/20100101 Firefox/121.0'
+];
+
+let lastUserAgentIndex = -1;
+
+function getRandomUserAgent() {
+    let index;
+    do {
+        index = Math.floor(Math.random() * USER_AGENT_POOL.length);
+    } while (index === lastUserAgentIndex && USER_AGENT_POOL.length > 1);
+    lastUserAgentIndex = index;
+    return USER_AGENT_POOL[index];
+}
+
+// Privacy headers for all requests
+const PRIVACY_HEADERS = {
+    'DNT': '1',
+    'Sec-GPC': '1',
+    'Accept-Language': 'en-US,en;q=0.9',
+    'Cache-Control': 'no-cache',
+    'Pragma': 'no-cache'
+};
+
+// ============================================
+// AEGIS SHIELD - Ad/Tracker Blocklist
+// ============================================
+const AD_TRACKER_BLOCKLIST = new Set([
+    'doubleclick.net',
+    'googlesyndication.com',
+    'googleadservices.com',
+    'google-analytics.com',
+    'analytics.google.com',
+    'facebook.com/tr',
+    'connect.facebook.net',
+    'ads.twitter.com',
+    'ads.linkedin.com',
+    'adsserver.',
+    'adservice.',
+    'tracking.',
+    'tracker.',
+    'pixel.',
+    'beacon.',
+    'clicktrack.',
+    'clickserve.',
+    'taboola.com',
+    'outbrain.com',
+    'criteo.com',
+    'pubmatic.com',
+    'rubiconproject.com',
+    'openx.net',
+    'adnxs.com',
+    'advertising.com'
+]);
 
 // Suspicious TLDs often used for phishing
 const SUSPICIOUS_TLDS = new Set([
@@ -52,6 +120,21 @@ function getRootDomain(hostname) {
     const parts = hostname.split('.');
     if (parts.length <= 2) return hostname;
     return parts.slice(-2).join('.');
+}
+
+/**
+ * AEGIS SHIELD - Check if URL is from blocked ad/tracker domain
+ */
+function isBlockedTracker(url) {
+    const domain = extractDomain(url);
+    if (!domain) return false;
+    
+    for (const blocked of AD_TRACKER_BLOCKLIST) {
+        if (domain.includes(blocked) || url.includes(blocked)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -504,9 +587,9 @@ export class TruthSeeker {
                 const response = await fetch(url, {
                     method: 'GET',
                     headers: {
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        'User-Agent': getRandomUserAgent(),
                         'Accept': 'text/html,application/xhtml+xml',
-                        'Accept-Language': 'en-US,en;q=0.9'
+                        ...PRIVACY_HEADERS
                     }
                 });
                 
@@ -600,6 +683,11 @@ export class TruthSeeker {
      * Step 4: Scrape and extract content
      */
     async scrapeContent(url) {
+        // AEGIS SHIELD: Block tracker domains
+        if (isBlockedTracker(url)) {
+            return { success: false, error: 'Blocked: tracker domain' };
+        }
+        
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), this.timeout);
@@ -607,8 +695,9 @@ export class TruthSeeker {
             const response = await fetch(url, {
                 signal: controller.signal,
                 headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    'Accept': 'text/html,application/xhtml+xml'
+                    'User-Agent': getRandomUserAgent(),
+                    'Accept': 'text/html,application/xhtml+xml',
+                    ...PRIVACY_HEADERS
                 }
             });
             
@@ -742,13 +831,23 @@ export class TruthSeeker {
             }
         }
         
-        // Filter by minimum relevance and sort
+        // AEGIS SHIELD: Filter by minimum relevance, safety, and blocklist
         const filtered = analyzed
-            .filter(r => r.relevance >= this.minRelevance)
+            .filter(r => {
+                // Reject unsafe results
+                if (r.security?.verdict === 'danger') return false;
+                // Reject tracker domains
+                if (isBlockedTracker(r.url)) return false;
+                // Minimum relevance threshold
+                return r.relevance >= this.minRelevance;
+            })
             .sort((a, b) => b.relevance - a.relevance)
             .slice(0, this.maxResults);
         
         this.onStep('complete', `Returning ${filtered.length} verified results`);
+        
+        // AMNESIA: Clear memory after search completes
+        this.clearMemory();
         
         return {
             results: filtered,
@@ -760,6 +859,15 @@ export class TruthSeeker {
             scraped: topCandidates.length,
             query
         };
+    }
+    
+    /**
+     * AMNESIA - Clear all cached data for privacy
+     */
+    clearMemory() {
+        this.securityScanner.cache.clear();
+        this.relevanceScorer.modelCache = null;
+        console.log('[TruthSeeker] Memory cleared - AMNESIA protocol complete');
     }
     
     /**

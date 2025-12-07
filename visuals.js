@@ -8,9 +8,9 @@ class AstralVisuals {
         this.canvas = document.getElementById(canvasId);
         this.ctx = this.canvas.getContext('2d');
         
-        // Low-res for pixelated effect
-        this.width = 150;
-        this.height = 100;
+        // OPTIMIZED: Lower resolution for better performance
+        this.width = 100;
+        this.height = 70;
         this.canvas.width = this.width;
         this.canvas.height = this.height;
         
@@ -18,14 +18,37 @@ class AstralVisuals {
         this.time = 0;
         this.animationId = null;
         
+        // PERFORMANCE: Frame throttling (render every Nth frame)
+        // renderInterval = 3 = ~20fps (optimal for background effect)
+        // renderInterval = 2 = ~30fps (if needed)
+        this.frameCount = 0;
+        this.renderInterval = 3; // OPTIMIZATION: 20fps for PS1 fog effect
+        
         // Accent color (will be updated from CSS)
         this.hue = 145; // Default green
+        
+        // Mouse position for magnetic effect
+        this.mx = 0;
+        this.my = 0;
+        
+        // Track mouse movement (throttled)
+        this.mouseThrottle = 0;
+        window.addEventListener('mousemove', e => {
+            this.mouseThrottle++;
+            if (this.mouseThrottle % 3 === 0) { // Only update every 3rd event
+                this.mx = (e.clientX / window.innerWidth) * this.width;
+                this.my = (e.clientY / window.innerHeight) * this.height;
+            }
+        });
         
         // Noise permutation table
         this.perm = this.generatePermutation();
         
         // Image data for direct pixel manipulation
         this.imageData = this.ctx.createImageData(this.width, this.height);
+        
+        // AUTO-PAUSE: Stop when tab not visible (save CPU)
+        this.handleVisibility();
     }
     
     generatePermutation() {
@@ -140,11 +163,27 @@ class AstralVisuals {
         const data = this.imageData.data;
         
         const scale = 0.02; // Noise scale
+        const magnetRadius = 35; // Size of the reaction field
         
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width; x++) {
-                // Get warped noise value
-                const n = this.warpedNoise(x * scale, y * scale, this.time);
+                // Calculate distance from current pixel to mouse
+                const dx = x - this.mx;
+                const dy = y - this.my;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                
+                let noiseX = x * scale;
+                let noiseY = y * scale;
+                
+                // Apply Magnetic Warp
+                if (dist < magnetRadius) {
+                    const force = (1 - dist / magnetRadius) * 0.8;
+                    noiseX -= (dx * force) * 0.05;
+                    noiseY -= (dy * force) * 0.05;
+                }
+                
+                // Get warped noise value with magnetic distortion
+                const n = this.warpedNoise(noiseX, noiseY, this.time);
                 
                 // Map noise to 0-1 range
                 const value = (n + 1) * 0.5;
@@ -155,7 +194,7 @@ class AstralVisuals {
                 const combined = base + highlight;
                 
                 // Convert to color with accent hue
-                const lightness = 0.03 + combined * 0.15; // Very dark, subtle glow
+                const lightness = 0.08 + combined * 0.3; // Brighter, more visible
                 const saturation = 0.4 + value * 0.3;
                 const [r, g, b] = this.hslToRgb(this.hue, saturation, lightness);
                 
@@ -172,8 +211,12 @@ class AstralVisuals {
     }
     
     animate() {
-        this.time += 0.008; // Slow movement
-        this.render();
+        this.frameCount++;
+        // THROTTLE: Only render every Nth frame (~30fps instead of 60fps)
+        if (this.frameCount % this.renderInterval === 0) {
+            this.time += 0.01;
+            this.render();
+        }
         this.animationId = requestAnimationFrame(() => this.animate());
     }
     

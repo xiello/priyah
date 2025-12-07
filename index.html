@@ -36,7 +36,7 @@
         <div id="title-sigil" data-text="PRIYAH">PRIYAH</div>
         <div class="header-tools">
             <button class="btn" onclick="openModal('settings-modal')">
-                <i class="fas fa-cog"></i> Config
+                <i class="fas fa-dharmachakra"></i> Sigils
             </button>
         </div>
     </header>
@@ -60,20 +60,23 @@
         <section id="stage">
             <div id="toolbar">
                 <button class="btn active" id="btn-chat" onclick="switchView('chat')">
-                    <i class="fas fa-comments"></i> Chat
+                    <i class="fas fa-crow"></i> Commune
                 </button>
                 <button class="btn" id="btn-forge" onclick="switchView('forge')">
                     <i class="fas fa-hammer"></i> Forge
                 </button>
                 <button class="btn" id="btn-constellation" onclick="switchView('constellation')">
-                    <i class="fas fa-star"></i> Constellation
+                    <i class="fas fa-star"></i> Stars
+                </button>
+                <button class="btn" id="btn-weaver" onclick="switchView('weaver')">
+                    <i class="fas fa-spider"></i> Weave
                 </button>
                 <div class="toolbar-divider"></div>
-                <button class="btn" id="toggle-search" onclick="toggleMode('search')" title="Enable web search">
-                    <i class="fas fa-globe"></i> Web
+                <button class="btn" id="toggle-search" onclick="toggleMode('search')" title="Scry the web">
+                    <i class="fas fa-eye"></i> Scry
                 </button>
-                <button class="btn" id="toggle-code" onclick="toggleMode('code')" title="Enable code mode">
-                    <i class="fas fa-code"></i> Code
+                <button class="btn" id="toggle-code" onclick="toggleMode('code')" title="Inscribe code">
+                    <i class="fas fa-pen-nib"></i> Inscribe
                 </button>
             </div>
 
@@ -145,67 +148,67 @@
                             </button>
                         </div>
                         
-                        <!-- Sorcerer's Terminal Dashboard -->
-                        <div class="sorcerer-terminal">
-                            <div class="terminal-header">
-                                <span class="terminal-title">◇ TELEMETRY</span>
-                                <span id="forge-status" style="color: var(--c-text-dim); font-size: 0.8rem;">Idle</span>
+                        <!-- Forge 3-Column Grid Dashboard -->
+                        <div class="forge-layout-grid">
+                            <!-- Column 1: Performance Graph -->
+                            <div class="forge-panel">
+                                <div class="terminal-header">
+                                    <span class="terminal-title">◇ PERFORMANCE</span>
+                                    <span id="forge-status" style="color: var(--c-text-dim); font-size: 0.7rem;">Idle</span>
+                                </div>
+                                <div class="telemetry-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0;">
+                                    <div class="telemetry-stat">
+                                        <div class="telemetry-value" id="stat-speed">0</div>
+                                        <div class="telemetry-label">K/sec</div>
+                                    </div>
+                                    <div class="telemetry-stat">
+                                        <div class="telemetry-value" id="stat-total">0</div>
+                                        <div class="telemetry-label">Total</div>
+                                    </div>
+                                    <div class="telemetry-stat">
+                                        <div class="telemetry-value" id="stat-failed" style="color: #c75050;">0</div>
+                                        <div class="telemetry-label">No Match</div>
+                                    </div>
+                                    <div class="telemetry-stat">
+                                        <div class="telemetry-value" id="stat-workers">0</div>
+                                        <div class="telemetry-label">Workers</div>
+                                    </div>
+                                </div>
+                                <div class="chart-container-fixed">
+                                    <canvas id="speed-chart"></canvas>
+                                </div>
                             </div>
-                            
-                            <div class="telemetry-grid">
-                                <div class="telemetry-stat">
-                                    <div class="telemetry-value" id="stat-speed">0</div>
-                                    <div class="telemetry-label">Keys/Sec</div>
+
+                            <!-- Column 2: Live Stream -->
+                            <div class="forge-panel">
+                                <div class="terminal-header">
+                                    <span class="terminal-title">◇ LIVE STREAM</span>
                                 </div>
-                                <div class="telemetry-stat">
-                                    <div class="telemetry-value" id="stat-total">0</div>
-                                    <div class="telemetry-label">Total Tested</div>
-                                </div>
-                                <div class="telemetry-stat">
-                                    <div class="telemetry-value" id="stat-failed" style="color: #c75050;">0</div>
-                                    <div class="telemetry-label">No Match</div>
-                                </div>
-                                <div class="telemetry-stat">
-                                    <div class="telemetry-value" id="stat-workers">0</div>
-                                    <div class="telemetry-label">Workers</div>
-                                </div>
-                            </div>
-                            
-                            <div class="speed-graph">
-                                <canvas id="speed-chart"></canvas>
-                            </div>
-                            
-                            <!-- Live Address Stream -->
-                            <div style="margin-top: 12px; margin-bottom: 12px;">
-                                <div style="font-size: 0.7rem; color: var(--c-gold-dim); margin-bottom: 6px; font-family: var(--f-runic); letter-spacing: 1px;">LIVE STREAM</div>
-                                <div id="address-stream" style="background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 4px; padding: 8px; font-family: var(--f-mono); font-size: 0.7rem; height: 100px; overflow-y: auto;">
+                                <div id="address-stream" style="font-family: var(--f-mono); font-size: 0.7rem; background: rgba(0,0,0,0.3); border-radius: 4px; padding: 8px;">
                                     <div style="color: var(--c-text-dim);">Waiting for forge to ignite...</div>
                                 </div>
-                            </div>
-                            
-                            <div class="terminal-log" id="forge-log" style="height: 60px;">
-                                <div class="log-entry">Forge standing by...</div>
-                            </div>
-                        </div>
-                        
-                        <!-- Found Wallets Terminal -->
-                        <div id="found-wallets-section" style="margin-top: 24px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                <div style="font-size: 0.8rem; color: var(--c-secondary); font-family: var(--f-runic); letter-spacing: 1px;">
-                                    ✦ FOUND WALLETS <span id="found-count" style="color: var(--c-accent);">(0)</span>
-                                </div>
-                                <div style="display: flex; gap: 6px;">
-                                    <button class="btn" style="font-size: 0.7rem; padding: 4px 8px;" onclick="exportAllWallets()">
-                                        <i class="fas fa-download"></i> Export All
-                                    </button>
-                                    <button class="btn" style="font-size: 0.7rem; padding: 4px 8px;" onclick="clearFoundWallets()">
-                                        <i class="fas fa-trash"></i> Clear
-                                    </button>
+                                <div class="terminal-log" id="forge-log" style="height: 50px; margin-top: 8px; flex-shrink: 0;">
+                                    <div class="log-entry">Forge standing by...</div>
                                 </div>
                             </div>
-                            <div id="found-wallets-list" style="background: rgba(0,0,0,0.6); border: 1px solid var(--glass-border); border-radius: 6px; max-height: 200px; overflow-y: auto;">
-                                <div style="padding: 16px; text-align: center; color: var(--c-text-dim); font-size: 0.8rem;">
-                                    No wallets found yet. Start mining!
+
+                            <!-- Column 3: Found Wallets -->
+                            <div class="forge-panel">
+                                <div class="terminal-header">
+                                    <span class="terminal-title">✦ FOUND (<span id="found-count">0</span>)</span>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button class="btn" style="font-size: 0.7rem; padding: 4px 8px;" onclick="exportAllWallets()">
+                                            <i class="fas fa-download"></i>
+                                        </button>
+                                        <button class="btn" style="font-size: 0.6rem; padding: 3px 6px;" onclick="clearFoundWallets()" title="Clear">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="found-wallets-list" style="background: rgba(0,0,0,0.3); border-radius: 4px;">
+                                    <div style="padding: 16px; text-align: center; color: var(--c-text-dim); font-size: 0.75rem;">
+                                        No wallets found yet
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -258,6 +261,23 @@
                 <div id="star-tooltip" class="star-tooltip" style="display: none;">
                     <div class="tooltip-date"></div>
                     <div class="tooltip-summary"></div>
+                </div>
+            </div>
+            
+            <!-- Weaver View - Algorithmic Art -->
+            <div id="view-weaver" class="view-panel dither-overlay">
+                <canvas id="weaver-canvas"></canvas>
+                <div id="weaver-controls">
+                    <button class="weaver-mode-btn active" data-mode="yggdrasil" onclick="setWeaverMode('yggdrasil')" title="Fractal Forest">
+                        <i class="fas fa-tree"></i>
+                    </button>
+                    <button class="weaver-mode-btn" data-mode="void" onclick="setWeaverMode('void')" title="Rune Void">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="weaver-mode-btn" data-mode="geometry" onclick="setWeaverMode('geometry')" title="Sacred Geometry">
+                        <i class="fas fa-circle-notch"></i>
+                    </button>
+                    <div class="weaver-mode-name">YGGDRASIL</div>
                 </div>
             </div>
         </section>
@@ -388,14 +408,6 @@
                 </div>
                 
                 <div class="settings-row">
-                    <label>Magical Pulse Animations</label>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="cfg-magic-active" onchange="toggleMagicMode(this.checked)">
-                        <span class="toggle-slider"></span>
-                    </label>
-                </div>
-                
-                <div class="settings-row">
                     <label>Sidebar Width</label>
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <input type="range" id="cfg-sidebar-width" min="180" max="400" value="240" 
@@ -467,7 +479,14 @@
             </button>
             <span id="portal-url"></span>
         </div>
-        <iframe id="portal-frame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms"></iframe>
+        <div id="portal-loader">
+            <div class="sigil-loader sigil-loader-lg">
+                <div class="octagon"></div>
+                <div class="octagon"></div>
+                <div class="center-dot"></div>
+            </div>
+        </div>
+        <iframe id="portal-frame" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-pointer-lock" onload="onPortalLoad()"></iframe>
     </div>
 
     <!-- Memory Modal (for Constellation view) -->
@@ -506,6 +525,13 @@
             activeFile: null,
             isLoading: false
         };
+
+        // ============================================
+        // KILL SWITCH - Global Mining Lock
+        // When mining, ALL visual engines MUST pause
+        // to dedicate 100% CPU to the forge
+        // ============================================
+        let isMining = false;
 
         // --- DOM ELEMENTS ---
         const els = {
@@ -651,15 +677,43 @@
 
         // --- VIEW MANAGEMENT ---
         function switchView(view) {
-            document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
-            document.getElementById(`view-${view}`).classList.add('active');
-            document.getElementById('btn-chat').classList.toggle('active', view === 'chat');
-            document.getElementById('btn-forge').classList.toggle('active', view === 'forge');
-            document.getElementById('btn-constellation').classList.toggle('active', view === 'constellation');
+            // Stop all background animations first (always cleanup)
+            stopAmbientStars();
+            if (weaverEngine) weaverEngine.stop();
             
-            // Initialize Constellation when switched to
+            // Hide all views
+            document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('#toolbar .btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Activate target view
+            const targetView = document.getElementById(`view-${view}`);
+            if (targetView) targetView.classList.add('active');
+            
+            const targetBtn = document.getElementById(`btn-${view}`);
+            if (targetBtn) targetBtn.classList.add('active');
+            
+            // KILL SWITCH CHECK: If mining, DO NOT start any visual engines
+            if (isMining) {
+                console.log('[KILL SWITCH] Mining active - visuals paused for', view);
+                return;
+            }
+            
+            // WEAVER: Must wait for DOM layout before resizing
+            if (view === 'weaver') {
+                requestAnimationFrame(() => {
+                    initWeaver();
+                    if (weaverEngine) {
+                        weaverEngine.resizeCanvas();
+                        weaverEngine.start();
+                    }
+                });
+            }
+            
+            // CONSTELLATION: Initialize and refresh data
             if (view === 'constellation') {
-                initConstellation();
+                requestAnimationFrame(() => {
+                    initConstellation();
+                });
             }
         }
 
@@ -847,20 +901,12 @@
             localStorage.setItem('priyah-sidebar-width', value);
         }
         
-        function toggleMagicMode(enabled) {
-            if (enabled) {
-                document.body.classList.add('magic-active');
-            } else {
-                document.body.classList.remove('magic-active');
-            }
-            localStorage.setItem('priyah-magic-active', enabled);
-        }
+
         
         // Load saved Dynamic Arcana settings on startup
         function loadArcanaSettings() {
             const savedHue = localStorage.getItem('priyah-accent-hue');
             const savedHex = localStorage.getItem('priyah-accent-hex');
-            const savedMagic = localStorage.getItem('priyah-magic-active');
             const savedOffset = localStorage.getItem('priyah-harmony-offset');
             const savedWidth = localStorage.getItem('priyah-sidebar-width');
             
@@ -871,10 +917,7 @@
             if (savedHex) {
                 document.getElementById('cfg-accent-color').value = savedHex;
             }
-            if (savedMagic === 'true') {
-                document.body.classList.add('magic-active');
-                document.getElementById('cfg-magic-active').checked = true;
-            }
+
             if (savedOffset) {
                 document.documentElement.style.setProperty('--harmony-offset', savedOffset);
                 document.getElementById('cfg-harmony-offset').value = savedOffset;
@@ -971,13 +1014,19 @@
         // --- PORTAL ---
         function openPortal(url) {
             if (!url) return;
-            document.getElementById('portal').classList.add('active');
+            const portal = document.getElementById('portal');
+            portal.classList.add('active', 'loading');
             document.getElementById('portal-frame').src = url;
             document.getElementById('portal-url').textContent = url;
         }
 
+        function onPortalLoad() {
+            document.getElementById('portal').classList.remove('loading');
+        }
+
         function closePortal() {
-            document.getElementById('portal').classList.remove('active');
+            const portal = document.getElementById('portal');
+            portal.classList.remove('active', 'loading');
             document.getElementById('portal-frame').src = 'about:blank';
         }
 
@@ -1186,6 +1235,8 @@
             
             try {
                 await ipcRenderer.invoke('save-memory', state.sessions);
+                // AUTO-UPDATE STARS: Refresh memory index
+                memoryIndex = await ipcRenderer.invoke('get-memory-index');
             } catch (e) {
                 console.error('Failed to save session:', e);
             }
@@ -1598,6 +1649,16 @@
                 return;
             }
             
+            // ========================================
+            // KILL SWITCH: PAUSE ALL VISUAL ENGINES
+            // Dedicate 100% CPU to the forge
+            // ========================================
+            isMining = true;
+            if (astralVisuals) astralVisuals.stop();
+            if (weaverEngine) weaverEngine.stop();
+            stopAmbientStars();
+            console.log('[KILL SWITCH] Activated - all visuals paused');
+            
             // Parse suffixes for display
             const suffixes = suffixString.split(',').map(s => s.trim()).filter(s => s);
             
@@ -1635,9 +1696,13 @@
             const suffixDesc = suffixes.length > 0 ? `Suffix${suffixes.length > 1 ? 'es' : ''}: ${suffixes.join(', ')}` : '';
             const target = [prefixDesc, suffixDesc].filter(Boolean).join(' | ');
             
+            // Update status to show visuals are paused
+            document.getElementById('forge-status').textContent = 'Forging (Visuals Paused)';
+            
             addForgeLog(`Target: ${target}`, 'normal');
             addForgeLog(`Workers: ${workers} | Case sensitive: ${matchCase ? 'Yes' : 'No'}`, 'normal');
             addForgeLog(`Generating REAL wallets (mnemonic-first)...`, 'normal');
+            addForgeLog(`[KILL SWITCH] All visuals paused for max CPU`, 'normal');
             
             ipcRenderer.send('start-mining', { 
                 prefix, 
@@ -1655,6 +1720,28 @@
             if (forgeTimerInterval) {
                 clearInterval(forgeTimerInterval);
                 forgeTimerInterval = null;
+            }
+            
+            // ========================================
+            // KILL SWITCH: RESUME VISUAL ENGINES
+            // ========================================
+            isMining = false;
+            console.log('[KILL SWITCH] Deactivated - resuming visuals');
+            
+            // Resume Astral background
+            if (astralVisuals) astralVisuals.start();
+            
+            // Resume view-specific visuals based on active view
+            const activeView = document.querySelector('.view-panel.active');
+            if (activeView) {
+                const viewId = activeView.id;
+                if (viewId === 'view-weaver' && weaverEngine) {
+                    weaverEngine.resizeCanvas();
+                    weaverEngine.start();
+                }
+                if (viewId === 'view-constellation') {
+                    initConstellation();
+                }
             }
         }
         
@@ -2016,14 +2103,101 @@
             if (constellationInitialized) renderStarMap();
         }
 
+        // Ambient placeholder stars when no chronicles exist
+        let ambientStarsAnimationId = null;
+        let ambientStarsActive = false; // REPAIR: Explicit state flag
+        
+        function renderAmbientStars(w, h) {
+            // SAFETY: Multiple checks to prevent infinite recursion
+            const view = document.getElementById('view-constellation');
+            
+            // REPAIR: Check explicit flag first
+            if (!ambientStarsActive) {
+                ambientStarsAnimationId = null;
+                return;
+            }
+            
+            // SAFETY: Stop if view is hidden or we have real memories
+            if (!view || !view.classList.contains('active') || memoryIndex.length > 0) {
+                ambientStarsAnimationId = null;
+                ambientStarsActive = false;
+                return;
+            }
+            
+            // SAFETY: Stop if mining (KILL SWITCH)
+            if (isMining) {
+                ambientStarsAnimationId = null;
+                ambientStarsActive = false;
+                return;
+            }
+            
+            // Clear previous frame
+            starCtx.clearRect(0, 0, w, h);
+            
+            const accentColor = getComputedStyle(document.documentElement)
+                .getPropertyValue('--c-accent').trim();
+            
+            // Draw static background stars (fewer for performance)
+            for (let i = 0; i < 40; i++) {
+                const x = Math.random() * w;
+                const y = Math.random() * h;
+                const r = Math.random() * 1.5 + 0.5;
+                const alpha = Math.random() * 0.5 + 0.2;
+                
+                starCtx.beginPath();
+                starCtx.arc(x, y, r, 0, Math.PI * 2);
+                starCtx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+                starCtx.fill();
+            }
+            
+            // Draw center sigil message
+            starCtx.save();
+            starCtx.font = '14px "New Academy"';
+            starCtx.fillStyle = accentColor;
+            starCtx.textAlign = 'center';
+            starCtx.globalAlpha = 0.6;
+            starCtx.fillText('No chronicles yet...', w / 2, h / 2 - 10);
+            starCtx.fillText('Start a conversation to create memories', w / 2, h / 2 + 15);
+            starCtx.restore();
+            
+            // Slower animation cycle (3 seconds) with proper cleanup
+            // REPAIR: Only schedule if still active
+            if (ambientStarsActive && memoryIndex.length === 0) {
+                ambientStarsAnimationId = setTimeout(() => {
+                    renderAmbientStars(w, h);
+                }, 3000);
+            }
+        }
+        
+        function stopAmbientStars() {
+            // REPAIR: Set flag first to prevent race conditions
+            ambientStarsActive = false;
+            if (ambientStarsAnimationId) {
+                clearTimeout(ambientStarsAnimationId);
+                ambientStarsAnimationId = null;
+            }
+        }
+        
+        function startAmbientStars(w, h) {
+            // REPAIR: Explicit start function
+            ambientStarsActive = true;
+            renderAmbientStars(w, h);
+        }
+
         function renderStarMap() {
-            if (!starCtx || memoryIndex.length === 0) return;
+            if (!starCtx) return;
             
             const w = starCanvas.width;
             const h = starCanvas.height;
             
             // Clear canvas
             starCtx.clearRect(0, 0, w, h);
+            
+            // If no chronicles exist, show ambient placeholder stars
+            if (memoryIndex.length === 0) {
+                startAmbientStars(w, h); // REPAIR: Use explicit start function
+                return;
+            }
             
             // Get accent color from CSS
             const accentColor = getComputedStyle(document.documentElement)
@@ -2168,15 +2342,15 @@
             resizeParticleCanvas();
             window.addEventListener('resize', resizeParticleCanvas);
             
-            // Create 50 particles
-            for (let i = 0; i < 50; i++) {
+            // Create 80 particles
+            for (let i = 0; i < 80; i++) {
                 particles.push({
                     x: Math.random() * particleCanvas.width,
                     y: Math.random() * particleCanvas.height,
                     vx: (Math.random() - 0.5) * 0.3,
                     vy: (Math.random() - 0.5) * 0.3,
                     size: Math.random() * 2 + 1,
-                    opacity: Math.random() * 0.5 + 0.2
+                    opacity: Math.random() * 0.6 + 0.4
                 });
             }
             
@@ -2225,10 +2399,56 @@
         let astralVisuals = null;
         
         function initAstralVisuals() {
-            const { AstralVisuals } = require('./visuals.js');
-            astralVisuals = new AstralVisuals('astral-canvas');
-            astralVisuals.handleVisibility();
-            astralVisuals.start();
+            requestAnimationFrame(() => {
+                const { AstralVisuals } = require('./visuals.js');
+                astralVisuals = new AstralVisuals('astral-canvas');
+                astralVisuals.start();
+                console.log("Astral Engine Ignited");
+            });
+        }
+
+        // ============================================
+        // WEAVER ENGINE - Algorithmic Art
+        // ============================================
+        let weaverEngine = null;
+        
+        function initWeaver() {
+            if (!weaverEngine) {
+                const { WeaverEngine } = require('./weaver.js');
+                weaverEngine = new WeaverEngine('weaver-canvas');
+                console.log("Weaver Engine Awakened");
+            }
+            weaverEngine.start();
+        }
+        
+        function setWeaverMode(mode) {
+            // Initialize engine if it doesn't exist
+            if (!weaverEngine) {
+                initWeaver();
+            }
+            
+            if (weaverEngine) {
+                weaverEngine.setMode(mode);
+                
+                // Restart animation if not mining (Kill Switch check)
+                if (!isMining) {
+                    weaverEngine.resizeCanvas();
+                    weaverEngine.start();
+                }
+                
+                // Update button states
+                document.querySelectorAll('.weaver-mode-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.mode === mode);
+                });
+                
+                // Update mode name
+                const modeNames = {
+                    'yggdrasil': 'YGGDRASIL',
+                    'void': 'THE VOID',
+                    'geometry': 'SACRED GEOMETRY'
+                };
+                document.querySelector('.weaver-mode-name').textContent = modeNames[mode] || mode.toUpperCase();
+            }
         }
 
         // Initialize particles and astral on load
